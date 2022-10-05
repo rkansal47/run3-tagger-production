@@ -11,6 +11,12 @@
 ## 6. use provided DIGI cfg
 ## 7. stop running dnntuples
 
+sleep $(( ( RANDOM % 200 ) + 1 ))
+
+wget --no-check-certificate https://coli.web.cern.ch/coli/tmp/.221001-022048_ttbarvm_prod/inputs.tar.gz
+tar xaf inputs.tar.gz
+rm -f inputs.tar.gz
+
 wget --no-check-certificate https://cms-project-generators.web.cern.ch/cms-project-generators/MG5_aMC_v2.6.5.tar.gz
 mv MG5_aMC_v2.6.5.tar.gz inputs/
 
