@@ -7,4 +7,4 @@ set param_card FRBlock 2 $2
 set param_card MASS 6 $3
 set param_card YUKAWA 6 $3
 set param_card MASS 23 $4
-set param_card DECAY 24 80.0
+set param_card DECAY 24 $5

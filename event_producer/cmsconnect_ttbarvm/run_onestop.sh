@@ -13,7 +13,7 @@
 
 sleep $(( ( RANDOM % 200 ) + 1 ))
 
-wget --no-check-certificate https://coli.web.cern.ch/coli/tmp/.221001-022048_ttbarvm_prod/inputs.tar.gz
+wget --no-check-certificate https://coli.web.cern.ch/coli/tmp/.221007-164419_ttbarvm_prod_v2/inputs.tar.gz
 tar xaf inputs.tar.gz
 rm -f inputs.tar.gz
 

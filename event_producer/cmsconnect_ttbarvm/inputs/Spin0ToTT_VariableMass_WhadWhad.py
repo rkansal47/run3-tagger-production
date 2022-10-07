@@ -20,16 +20,16 @@ m_top = np.array([15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 14
 m_z = 0.53 * m_top
 m_z[m_z < 80] = 80  # to avoid unphysical m_w
 m_res = np.arange(600, 6000, 100)
-mpoints = [(mx, mx/100., mt, m_z[it]) for mx in m_res for it, mt in enumerate(m_top)]
+mpoints = [(mx, mx/100., mt, m_z[it], m_z[it]) for mx in m_res for it, mt in enumerate(m_top)]
 # print(mpoints)
 
-for mx, wx, mt, mz in mpoints:
+for mx, wx, mt, mz, ww in mpoints:
     # print('SpinToTT_VariableMass_WhadWhad_MX%.0f_WX%.0f_MH%.0f_MZ%.1f_WW80' % (mx, wx, mt, mz))
     generator.RandomizedParameters.append(
         cms.PSet(
             ConfigWeight = cms.double(1),
-            GridpackPath =  cms.string('instMG://Spin0ToTT_VariableMass_WhadWhad/MG5_aMC_v2.6.5/%.0f:%.0f:%.0f:%.1f.tar.xz' % (mx, wx, mt, mz)),
-            ConfigDescription = cms.string('Spin0ToTT_VariableMass_WhadWhad_MX%.0f_WX%.0f_MH%.0f_MZ%.1f_WW80' % (mx, wx, mt, mz)),
+            GridpackPath =  cms.string('instMG://Spin0ToTT_VariableMass_WhadWhad/MG5_aMC_v2.6.5/%.0f:%.0f:%.0f:%.1f:%.1f' % (mx, wx, mt, mz, ww)),
+            ConfigDescription = cms.string('Spin0ToTT_VariableMass_WhadWhad_MX%.0f_WX%.0f_MH%.0f_MZ%.1f_WW%.1f' % (mx, wx, mt, mz, ww)),
             PythiaParameters = cms.PSet(
                 pythia8CommonSettingsBlock,
                 pythia8CP5SettingsBlock,

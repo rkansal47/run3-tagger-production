@@ -12,5 +12,5 @@ define ell- = e- mu- ta-
 define vl = ve vm vt
 define vl~ = ve~ vm~ vt~
 #signal term for scalar
-generate p p > h0 > t t~ , (t > w+ b, w+ > j j), (t~ > w- b~, w- > j j) NP^2==2
+generate p p > h0, (h0 > t t~, (t > w+ b, w+ > j j), (t~ > w- b~, w- > j j)) NP^2==2
 output Spin0ToTT_VariableMass_WhadWhad -nojpeg
