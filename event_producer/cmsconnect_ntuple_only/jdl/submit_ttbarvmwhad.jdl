@@ -22,4 +22,4 @@ transfer_output_files   = dnntuple.root
 transfer_output_remaps  = "dnntuple.root = output/dnntuple_$(Cluster)-$(Process).root"
 
 
-Queue Infiles from samples/mc_2017_ttbarwmwlep_filelist.txt
+Queue Infiles from samples/mc_2017_ttbarvmwhad_filelist.txt
