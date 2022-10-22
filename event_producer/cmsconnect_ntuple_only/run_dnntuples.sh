@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 
 INPUTFILES=$1
 WORKDIR=`pwd`
@@ -25,7 +25,7 @@ cd DeepNTuples/Ntupler/test/
 
 function retry {
   local n=1
-  local max=10
+  local max=5
   local delay=5
   while true; do
     "$@" && break || {
@@ -46,8 +46,7 @@ IFS=',' read -ra ADDR <<< "$INPUTFILES"
 idx=0
 for infile in "${ADDR[@]}"; do
   echo $infile $idx
-  # retry cmsRun DeepNtuplizerAK8.py inputFiles=${infile}
-  cmsRun DeepNtuplizerAK8.py inputFiles=${infile}
+  retry cmsRun DeepNtuplizerAK8.py inputFiles=${infile}
   mv output.root dnntuple_raw${idx}.root
   idx=$(($idx+1))
 done
