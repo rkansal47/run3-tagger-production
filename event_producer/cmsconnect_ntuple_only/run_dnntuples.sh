@@ -12,12 +12,14 @@ cd CMSSW_10_6_30/src
 eval `scram runtime -sh`
 
 # use an updated onnxruntime package
-bash <(curl -s https://raw.githubusercontent.com/colizz/DNNTuples/dev-UL-hww/Ntupler/scripts/install_onnxruntime.sh)
+curl -s --retry 10 https://raw.githubusercontent.com/colizz/DNNTuples/dev-UL-hww/Ntupler/scripts/install_onnxruntime.sh -o install_onnxruntime.sh
+bash install_onnxruntime.sh
+rm -f install_onnxruntime.sh
 
 # clone this repo into "DeepNTuples" directory
 git clone https://github.com/colizz/DNNTuples.git DeepNTuples -b dev-UL-hww
 
-scram b
+scram b -j8
 
 cd DeepNTuples/Ntupler/test/
 
@@ -44,7 +46,8 @@ IFS=',' read -ra ADDR <<< "$INPUTFILES"
 idx=0
 for infile in "${ADDR[@]}"; do
   echo $infile $idx
-  retry cmsRun DeepNtuplizerAK8.py inputFiles=${infile}
+  # retry cmsRun DeepNtuplizerAK8.py inputFiles=${infile}
+  cmsRun DeepNtuplizerAK8.py inputFiles=${infile}
   mv output.root dnntuple_raw${idx}.root
   idx=$(($idx+1))
 done
