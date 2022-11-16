@@ -28,18 +28,19 @@ for point in mpoints:
                 pythia8CommonSettingsBlock,
                 pythia8CP5SettingsBlock,
                 pythia8PSweightsSettingsBlock,
-                # processParameters = cms.vstring('25:onMode = off',
-                #                                 '25:oneChannel = 1 0.33333 100 5 -5',
-                #                                 '25:addChannel = 1 0.33333 100 4 -4',
-                #                                 '25:addChannel = 1 0.11111 100 3 -3',
-                #                                 '25:addChannel = 1 0.11111 100 2 -2',
-                #                                 '25:addChannel = 1 0.11111 100 1 -1',
-                #                                 'ResonanceDecayFilter:filter = on'
-                # ),
+                processParameters = cms.vstring('25:onMode = off',
+                                                '25:oneChannel = 1 0.33333 100 15 -15',
+                                                '25:addChannel = 1 0.16666 100 5 -5',
+                                                '25:addChannel = 1 0.16666 100 4 -4',
+                                                '25:addChannel = 1 0.16666 100 3 -3',
+                                                '25:addChannel = 1 0.08333 100 2 -2',
+                                                '25:addChannel = 1 0.08333 100 1 -1',
+                                                'ResonanceDecayFilter:filter = on'
+                ),
 		parameterSets = cms.vstring('pythia8CommonSettings',
                                     'pythia8CP5Settings',
                                     'pythia8PSweightsSettings',
-                			        # 'processParameters',
+                			        'processParameters',
 		)
             )
         )
