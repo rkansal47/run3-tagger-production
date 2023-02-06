@@ -1,0 +1,31 @@
+Universe   = vanilla
+Executable = run_onestop.sh
+
++ProjectName="cms.org.cern"
+
+# custom args
+NEVENT = 500
+NTHREAD = 1
+PROCNAME = GluGluToH1JetToWW_HEFT_MH-15to250_JHUVariableWMass
+BEGINSEED = 0
+
+Arguments = $(JOBNUM) $(NEVENT) $(NTHREAD) $(PROCNAME) $(BEGINSEED)
+
+requirements = (OpSysAndVer =?= "CentOS7")
+request_cpus = 1
+request_memory = 2000
+use_x509userproxy = true
+
++JobFlavour = "tomorrow"
+
+Log        = log/job.log_$(Cluster)
+Output     = log/job.out_$(Cluster)-$(Process)
+Error      = log/job.err_$(Cluster)-$(Process)
+
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT_OR_EVICT
+# transfer_input_files    = inputs
+transfer_output_files   = miniv2.root
+transfer_output_remaps  = "miniv2.root = output/miniv2_$(Cluster)-$(Process).root"
+
+Queue JOBNUM from seq 1 1000 |
