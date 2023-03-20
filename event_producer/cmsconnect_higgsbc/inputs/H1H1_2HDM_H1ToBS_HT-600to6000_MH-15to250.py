@@ -22,12 +22,12 @@ mpoints = [(mh, mh/100., htmin) for htmin in htmins for mh in m_higgs]
 # print(mpoints)
 
 for mh, wh, htmin in mpoints:
-    # print('ChargedHiggs_HplusToBC_HminusToBC_MH%.0f_WH%.2f_HTmin%.0f' % (mh, wh, htmin))
+    # print('H1H1_2HDM_H1ToBS_MH%.0f_WH%.2f_HTmin%.0f' % (mh, wh, htmin))
     generator.RandomizedParameters.append(
         cms.PSet(
             ConfigWeight = cms.double(1),
-            GridpackPath =  cms.string('instMG://ChargedHiggs_HplusToBC_HminusToBC_HT-600to6000_MH-15to250/MG5_aMC_v2.6.5/%.0f:%.2f:%.0f' % (mh, wh, htmin)),
-            ConfigDescription = cms.string('ChargedHiggs_HplusToBC_HminusToBC_MH%.0f_WH%.2f_HTmin%.0f' % (mh, wh, htmin)),
+            GridpackPath =  cms.string('instMG://H1H1_2HDM_H1ToBS_HT-600to6000_MH-15to250/MG5_aMC_v2.6.5/%.0f:%.2f:%.0f' % (mh, wh, htmin)),
+            ConfigDescription = cms.string('H1H1_2HDM_H1ToBS_MH%.0f_WH%.2f_HTmin%.0f' % (mh, wh, htmin)),
             PythiaParameters = cms.PSet(
                 pythia8CommonSettingsBlock,
                 pythia8CP5SettingsBlock,
