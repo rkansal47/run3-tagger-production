@@ -25,9 +25,6 @@ if [ -d /afs/cern.ch/user/${USER:0:1}/$USER ]; then
 fi
 env
 
-# if [ -d /afs/cern.ch/user/${USER:0:1}/$USER ]; then
-#     source /cvmfs/cms.cern.ch/cmsset_default.sh && cd ~/work/calib/custom_nano/CMSSW_10_6_30/src && eval `scram runtime -sh` && cd -
-# fi
 JOBNUM=${1##*=} # hard coded by crab
 NEVENT=${2##*=} # ordered by crab.py script
 NTHREAD=${3##*=} # ordered by crab.py script
@@ -62,6 +59,8 @@ cp -f $WORKDIR/inputs/scripts/{lhe_modifier.py,run_instMG.sh} GeneratorInterface
 if ! [ -z $LHEPRODSCRIPT ]; then
   cp -f $WORKDIR/inputs/scripts/$LHEPRODSCRIPT GeneratorInterface/LHEInterface/data/
   sed -i "s|run_generic_tarball_cvmfs.sh|${LHEPRODSCRIPT}|g" GeneratorInterface/Core/src/BaseHadronizer.cc
+else
+  sed -i "s|run_generic_tarball_cvmfs.sh|run_instMG.sh|g" GeneratorInterface/Core/src/BaseHadronizer.cc
 fi
 
 # copy the fragment
