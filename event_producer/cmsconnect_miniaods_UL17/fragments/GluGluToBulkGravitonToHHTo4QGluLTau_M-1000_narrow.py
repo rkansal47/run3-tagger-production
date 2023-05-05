@@ -15,11 +15,8 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
     RandomizedParameters = cms.VPSet(),
 )
 
-import numpy as np
-m_higgs = np.array([15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250])
-m_res = np.arange(600, 6000, 100)
-mpoints = [(mx, mh) for mx in m_res for mh in m_higgs]
-# print(mpoints)
+# specify a single (MX, MH) point
+mpoints=[(1000, 125)]
 
 for mx, mh in mpoints:
     # print('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh))
@@ -32,9 +29,22 @@ for mx, mh in mpoints:
                 pythia8CommonSettingsBlock,
                 pythia8CP5SettingsBlock,
                 pythia8PSweightsSettingsBlock,
+                processParameters = cms.vstring('25:onMode = off',
+                                                '25:oneChannel = 1 0.12500 100 5 -5',
+                                                '25:addChannel = 1 0.12500 100 4 -4',
+                                                '25:addChannel = 1 0.12500 100 3 -3',
+                                                '25:addChannel = 1 0.06250 100 2 -2',
+                                                '25:addChannel = 1 0.06250 100 1 -1',
+                                                '25:addChannel = 1 0.12500 100 21 21',
+                                                '25:addChannel = 1 0.06250 100 11 -11',
+                                                '25:addChannel = 1 0.06250 100 13 -13',
+                                                '25:addChannel = 1 0.25000 100 15 -15',
+                                                'ResonanceDecayFilter:filter = on'
+                ),
                 parameterSets = cms.vstring('pythia8CommonSettings',
                                             'pythia8CP5Settings',
                                             'pythia8PSweightsSettings',
+                                            'processParameters',
 		        )
             )
         )

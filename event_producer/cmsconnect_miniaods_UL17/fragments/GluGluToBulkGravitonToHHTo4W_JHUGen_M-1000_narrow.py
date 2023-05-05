@@ -15,11 +15,8 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
     RandomizedParameters = cms.VPSet(),
 )
 
-import numpy as np
-m_higgs = np.array([15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250])
-m_res = np.arange(600, 6000, 100)
-mpoints = [(mx, mh) for mx in m_res for mh in m_higgs]
-# print(mpoints)
+# specify a single (MX, MH) point
+mpoints=[(1000, 125)]
 
 for mx, mh in mpoints:
     # print('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh))

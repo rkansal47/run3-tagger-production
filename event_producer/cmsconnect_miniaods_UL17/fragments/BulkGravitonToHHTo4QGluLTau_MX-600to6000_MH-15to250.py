@@ -22,7 +22,7 @@ mpoints = [(mx, mh) for mx in m_res for mh in m_higgs]
 # print(mpoints)
 
 for mx, mh in mpoints:
-    # print('ChargedHiggs_HplusToCS_HminusToCS_MH%.0f_WH%.2f_HTmin%.0f' % (mh, wh, htmin))
+    # print('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh))
     generator.RandomizedParameters.append(
         cms.PSet(
             ConfigWeight = cms.double(1),
