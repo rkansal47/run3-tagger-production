@@ -11,7 +11,7 @@
 ## 6. use provided DIGI cfg
 ## 7. stop running dnntuples
 
-# sleep $(( ( RANDOM % 200 ) + 1 ))
+sleep $(( ( RANDOM % 200 ) + 1 ))
 
 wget --tries=3 https://github.com/colizz/hww-tagging/archive/refs/heads/dev-miniaods.tar.gz
 tar xaf dev-miniaods.tar.gz
@@ -53,7 +53,8 @@ CMSSW_BASE_ORIG=${CMSSW_BASE}
 
 # customize CMSSW code
 
-rsync -avP /cvmfs/cms.cern.ch/$SCRAM_ARCH/cms/cmssw/$CMSSW_VERSION/src/GeneratorInterface/{Core,LHEInterface} $CMSSW_BASE/src/GeneratorInterface
+mkdir $CMSSW_BASE/src/GeneratorInterface
+cp -rf /cvmfs/cms.cern.ch/$SCRAM_ARCH/cms/cmssw/$CMSSW_VERSION/src/GeneratorInterface/{Core,LHEInterface} $CMSSW_BASE/src/GeneratorInterface/
 # copy customized LHE production script
 cp -f $WORKDIR/inputs/scripts/{lhe_modifier.py,run_instMG.sh} GeneratorInterface/LHEInterface/data/
 # use customized LHE production script, if specified
