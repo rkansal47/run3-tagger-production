@@ -13,8 +13,9 @@
 
 sleep $(( ( RANDOM % 200 ) + 1 ))
 
-git clone https://github.com/colizz/hww-tagging.git -b dev-miniaods
-mv hww-tagging/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
+wget --tries=3 https://github.com/colizz/hww-tagging/archive/refs/heads/dev-miniaods.zip
+unzip -q dev-miniaods.zip
+mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
 
 wget --no-check-certificate https://cms-project-generators.web.cern.ch/cms-project-generators/MG5_aMC_v2.6.5.tar.gz
