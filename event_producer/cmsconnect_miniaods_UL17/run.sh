@@ -11,10 +11,10 @@
 ## 6. use provided DIGI cfg
 ## 7. stop running dnntuples
 
-sleep $(( ( RANDOM % 200 ) + 1 ))
+# sleep $(( ( RANDOM % 200 ) + 1 ))
 
-wget --tries=3 https://github.com/colizz/hww-tagging/archive/refs/heads/dev-miniaods.zip
-unzip -q dev-miniaods.zip
+wget --tries=3 https://github.com/colizz/hww-tagging/archive/refs/heads/dev-miniaods.tar.gz
+tar xaf dev-miniaods.tar.gz
 mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
 
