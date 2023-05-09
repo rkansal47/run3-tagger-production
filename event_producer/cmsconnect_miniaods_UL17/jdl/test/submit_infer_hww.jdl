@@ -6,10 +6,10 @@ Executable = run.sh
 # custom args
 NEVENT = 500
 NTHREAD = 1
-PROCNAME = GluGluToBulkGravitonToHHTo4W_JHUGen_M-1000_narrow
+PROCNAME = GluGluToBulkGravitonToHHTo4W_JHUGen_MH-50-125-250-300_RatioMGMH-8_narrow
 
 # note: use different seeds in different H->2prong and H->WW/ZZ routines to avoid overlap in LHE events
-BEGINSEED = 9102000
+BEGINSEED = 9106000
 
 # special LHE production configs for HWW/HZZ
 LHEPRODSCRIPT = run_instMG_JHUDefaultWMass.sh
@@ -32,4 +32,4 @@ when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_output_files   = miniv2.root
 transfer_output_remaps  = "miniv2.root = output/$(PROCNAME)/miniv2_$(Cluster)-$(Process).root"
 
-Queue JOBNUM from seq 1 400 |
+Queue JOBNUM from seq 1 1600 |

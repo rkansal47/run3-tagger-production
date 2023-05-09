@@ -15,8 +15,8 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
     RandomizedParameters = cms.VPSet(),
 )
 
-# specify a single (MX, MH) point
-mpoints=[(1000, 125)]
+# specify (MX, MH) points for test dataset
+mpoints=[(400, 50), (1000, 125), (2000, 250), (2800, 350)]
 
 for mx, mh in mpoints:
     # print('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh))
