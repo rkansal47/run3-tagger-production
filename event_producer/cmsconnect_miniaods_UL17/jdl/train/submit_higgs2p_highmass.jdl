@@ -1,7 +1,7 @@
 Universe   = vanilla
 Executable = run.sh
 
-+ProjectName="cms.org.cern"
++ProjectName="cms.org.fnal"
 
 # custom args
 NEVENT = 500
