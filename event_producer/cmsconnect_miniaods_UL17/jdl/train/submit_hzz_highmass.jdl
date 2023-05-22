@@ -1,0 +1,35 @@
+Universe   = vanilla
+Executable = run.sh
+
++ProjectName="cms.org.cern"
+
+# custom args
+NEVENT = 500
+NTHREAD = 1
+PROCNAME = BulkGravitonToHHTo4Z_MX-800to8000_MH-260to650_JHUVariableZMass
+
+# note: use different seeds in different H->2prong and H->WW/ZZ routines to avoid overlap in LHE events
+BEGINSEED = 280000
+
+# special LHE production configs for HWW/HZZ
+LHEPRODSCRIPT = run_instMG_JHUVariableZMassFixRatio.sh
+
+Arguments = $(JOBNUM) $(NEVENT) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(LHEPRODSCRIPT)
+
+requirements = (OpSysAndVer =?= "CentOS7")
+request_cpus = 1
+request_memory = 2000
+use_x509userproxy = true
+
++JobFlavour = "tomorrow"
+
+Log        = log/job.log_$(Cluster)
+Output     = log/job.out_$(Cluster)-$(Process)
+Error      = log/job.err_$(Cluster)-$(Process)
+
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT_OR_EVICT
+transfer_output_files   = miniv2.root
+transfer_output_remaps  = "miniv2.root = output/$(PROCNAME)/miniv2_$(Cluster)-$(Process).root"
+
+Queue JOBNUM from seq 1 2 |
