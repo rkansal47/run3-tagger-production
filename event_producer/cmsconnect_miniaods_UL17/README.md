@@ -10,3 +10,7 @@ To launch *all training samples* (on cmsconnect):
  - in case of failures, use `condor_release <ClusterID>` to resubmit the failed jobs.
 
 Note: remember to change the `BEGINSEED` in the condor jdl file so that the produced LHE events are not overlapping.
+
+## To submit 
+e.g.:
+condor_submit jdl/train/submit_hbs_highmass.jdl
