@@ -2,6 +2,10 @@
 
 INPUTFILES=$1
 ISTRAIN=$2
+if ! [ -z "$3" ]; then
+  EOSPATH=$3
+fi
+
 WORKDIR=`pwd`
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
@@ -59,3 +63,7 @@ fi
 ### end processing file
 
 mv dnntuple.root ${WORKDIR}/dnntuple.root
+
+if ! [ -z "$EOSPATH" ]; then
+  xrdcp --silent -p -f ${WORKDIR}/dnntuple.root $EOSPATH
+fi
