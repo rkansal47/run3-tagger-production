@@ -3,8 +3,8 @@ Executable = run_dnntuples.sh
 
 +ProjectName="cms.org.cern"
 
-PROCABBR = infer_higgs2p
-PROCNAME = GluGluToBulkGravitonToHHTo4QGluLTau_MH-50-125-250-300_RatioMGMH-8_narrow
+PROCABBR = infer_hwwhpt
+PROCNAME = GluGluToBulkGravitonToHHTo4W_JHUGen_MH-50-125-250-300_RatioMGMH-20_narrow
 ISTRAIN  = 0
 
 Arguments = $(Infiles) $(ISTRAIN)
