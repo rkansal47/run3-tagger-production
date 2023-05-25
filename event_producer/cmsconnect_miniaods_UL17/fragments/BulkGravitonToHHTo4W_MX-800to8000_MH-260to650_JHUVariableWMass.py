@@ -16,17 +16,39 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
 )
 
 import numpy as np
+
+
+# low mass list
+low_m_higgs = np.array([15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250])
+
+# high mass list
 m_higgs = np.arange(260, 660, 10)
-m_res = np.arange(800, 8000, 100)
+m_res = np.arange(600, 6000, 100)
 mpoints = [(mx, mh) for mx in m_res for mh in m_higgs]
-# print(mpoints)
+
+# reweight points such that there are the same number of events at 260 as 250 GeV
+# and then continuously decrease the weight from there till 650 GeV
+num_low_points = len(low_m_higgs)
+num_high_points = len(m_higgs)
+
+# solve system of equations s.t. 1) total weight sums to 1, and 2) the first weight is 1 / (# of low points) i.e. same # of events as 260 GeV
+m = np.array([[num_high_points, num_high_points * (num_high_points - 1) / 2], [1, num_high_points]])
+b = np.array([1, 1 / num_low_points])
+# a is smallest weight, d is spacing between weights
+a, d = np.linalg.inv(m).dot(b)
+
+
+def mh_weight(mh):
+    idx = np.where(m_higgs == mh)[0][0]
+    return a + d * idx
+
 
 for mx, mh in mpoints:
     # print('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh))
     generator.RandomizedParameters.append(
         cms.PSet(
-            ConfigWeight = cms.double(1),
-            GridpackPath =  cms.string('instMG://BulkGravitonToHH_MX-800to8000_MH-260to650/MG5_aMC_v2.6.5/%.0f:%.0f' % (mx, mh)),
+            ConfigWeight = cms.double(mh_weight(mh)),
+            GridpackPath =  cms.string('instMG://BulkGravitonToHH_MX-600to6000_MH-260to650/MG5_aMC_v2.6.5/%.0f:%.0f' % (mx, mh)),
             ConfigDescription = cms.string('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh)),
             PythiaParameters = cms.PSet(
                 pythia8CommonSettingsBlock,
