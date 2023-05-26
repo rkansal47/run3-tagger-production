@@ -6,7 +6,7 @@ Executable = run.sh
 # custom args
 NEVENT = 500
 NTHREAD = 1
-PROCNAME = BulkGravitonToHHTo4W_MX-800to8000_MH-260to650_JHUVariableWMass
+PROCNAME = BulkGravitonToHHTo4W_MX-600to16000_MH-260to650_JHUVariableWMass
 
 # note: use different seeds in different H->2prong and H->WW/ZZ routines to avoid overlap in LHE events
 BEGINSEED = 232000
