@@ -40,7 +40,7 @@ a, d = np.linalg.inv(m).dot(b)
 
 def mh_weight(mh):
     idx = np.where(m_higgs == mh)[0][0]
-    return a + d * idx
+    return a + d * (len(m_higgs) - idx - 1)
 
 
 for mx, mh in mpoints:
