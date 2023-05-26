@@ -44,10 +44,10 @@ def mh_weight(mh):
     return a + d * (len(m_higgs) - idx - 1)
 
 
-for i, mh in enumerate(mpoints):
+for i, mh in enumerate(m_higgs):
     m_res = np.linspace(m_res_min[i], m_res_min[i] * 10, len(low_m_res), endpoint=False)
     for mx in m_res:
-        # print('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh))
+        print('BulkGravitonToHH_MX%.0f_MH%.0f weight %.5f' % (mx, mh, mh_weight(mh)))
         generator.RandomizedParameters.append(
             cms.PSet(
                 ConfigWeight = cms.double(mh_weight(mh)),
