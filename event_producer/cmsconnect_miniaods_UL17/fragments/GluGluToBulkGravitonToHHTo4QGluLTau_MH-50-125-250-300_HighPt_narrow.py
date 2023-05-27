@@ -16,7 +16,7 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
 )
 
 # specify (MX, MH) points for test dataset
-mpoints=[(1000, 50), (2500, 125), (5000, 250), (7000, 350)]
+mpoints=[(2489, 50), (2500, 125), (2537, 250), (2584, 350)]
 
 for mx, mh in mpoints:
     # print('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh))
@@ -29,9 +29,22 @@ for mx, mh in mpoints:
                 pythia8CommonSettingsBlock,
                 pythia8CP5SettingsBlock,
                 pythia8PSweightsSettingsBlock,
+                processParameters = cms.vstring('25:onMode = off',
+                                                '25:oneChannel = 1 0.12500 100 5 -5',
+                                                '25:addChannel = 1 0.12500 100 4 -4',
+                                                '25:addChannel = 1 0.12500 100 3 -3',
+                                                '25:addChannel = 1 0.06250 100 2 -2',
+                                                '25:addChannel = 1 0.06250 100 1 -1',
+                                                '25:addChannel = 1 0.12500 100 21 21',
+                                                '25:addChannel = 1 0.06250 100 11 -11',
+                                                '25:addChannel = 1 0.06250 100 13 -13',
+                                                '25:addChannel = 1 0.25000 100 15 -15',
+                                                'ResonanceDecayFilter:filter = on'
+                ),
                 parameterSets = cms.vstring('pythia8CommonSettings',
                                             'pythia8CP5Settings',
                                             'pythia8PSweightsSettings',
+                                            'processParameters',
 		        )
             )
         )
