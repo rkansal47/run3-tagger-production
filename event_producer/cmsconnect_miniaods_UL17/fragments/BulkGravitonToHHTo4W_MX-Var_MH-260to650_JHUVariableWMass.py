@@ -47,7 +47,7 @@ def mh_weight(mh):
 def mres_min(mh):
     """Choose mX for mH s.t. mX^2 - 4mH^2 remains constant for each mH"""
     mdel = 600**2 - 4 * 250**2
-    return np.sqrt(mdel - 4 * mh ** 2)
+    return np.sqrt(mdel + 4 * mh ** 2)
 
 
 for mh in m_higgs:
