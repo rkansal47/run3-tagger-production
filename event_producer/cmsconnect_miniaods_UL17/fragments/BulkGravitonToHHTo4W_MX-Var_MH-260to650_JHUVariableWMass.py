@@ -24,8 +24,8 @@ low_m_res = np.arange(600, 6000, 100)
 
 # high mass list
 m_higgs = np.arange(260, 660, 10)
-# minimum m_res changes s.t. it is always > 2x m_higgs to avoid off-shell Higgses
-m_res_min = np.linspace(600, 1600, len(m_higgs))  
+# # minimum m_res changes s.t. it is always > 2x m_higgs to avoid off-shell Higgses
+# m_res_min = np.linspace(600, 1600, len(m_higgs))  
 
 # reweight points such that there are the same number of events at 260 as 250 GeV
 # and then continuously decrease the weight from there till 650 GeV
@@ -44,14 +44,20 @@ def mh_weight(mh):
     return a + d * (len(m_higgs) - idx - 1)
 
 
-for i, mh in enumerate(m_higgs):
-    m_res = np.linspace(m_res_min[i], m_res_min[i] * 10, len(low_m_res), endpoint=False)
+def mres_min(mh):
+    """Choose mX for mH s.t. mX^2 - 4mH^2 remains constant for each mH"""
+    mdel = 600**2 - 4 * 250**2
+    return np.sqrt(mdel - 4 * mh ** 2)
+
+
+for mh in m_higgs:
+    m_res = np.linspace(mres_min(mh), mres_min(mh) * 10, len(low_m_res), endpoint=False)
     for mx in m_res:
         print('BulkGravitonToHH_MX%.0f_MH%.0f weight %.5f' % (mx, mh, mh_weight(mh)))
         generator.RandomizedParameters.append(
             cms.PSet(
                 ConfigWeight = cms.double(mh_weight(mh)),
-                GridpackPath =  cms.string('instMG://BulkGravitonToHH_MX-600to6000_MH-260to650/MG5_aMC_v2.6.5/%.0f:%.0f' % (mx, mh)),
+                GridpackPath =  cms.string('instMG://BulkGravitonToHH_MX-Var_MH-260to650/MG5_aMC_v2.6.5/%.0f:%.0f' % (mx, mh)),
                 ConfigDescription = cms.string('BulkGravitonToHH_MX%.0f_MH%.0f' % (mx, mh)),
                 PythiaParameters = cms.PSet(
                     pythia8CommonSettingsBlock,
