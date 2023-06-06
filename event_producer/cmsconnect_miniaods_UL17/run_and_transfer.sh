@@ -86,6 +86,15 @@ cd $WORKDIR
 # SEED=$((${BEGINSEED} + ${JOBNUM}))
 SEED=$(((${BEGINSEED} + ${JOBNUM}) * 100))
 
+## NanoGEN
+# cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGENNANO_cfg.py --eventcontent NANOAODGEN --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAOD --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)" --fileout file:lhegennano.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --step LHE,GEN,NANOGEN --geometry DB:Extended --era Run2_2017 --mc -n $NEVENT --nThreads $NTHREAD || exit $? ;
+## Framework job
+# cmsRun -j FrameworkJobReport.xml wmLHEGENNANO_cfg.py
+## Transfer
+# xrdcp --silent -p -f lhegennano.root $EOSPATH
+# touch dummy.cc
+# if, NanoGEN, comment everything else below
+
 # need to specify seeds otherwise gridpacks will be chosen from the same routine!!
 # remember to identify process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" and externalLHEProducer->generator!!
 cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)" --step GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
