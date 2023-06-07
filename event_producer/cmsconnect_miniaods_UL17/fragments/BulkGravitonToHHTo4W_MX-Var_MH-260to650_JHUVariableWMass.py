@@ -49,25 +49,8 @@ def mres_min(mh):
     return np.sqrt(mdel + 4 * mh ** 2)
 
 
-print("\n\n\n\nTESTING\n\n\n\n")
-
-print(m_higgs)
-
-
 for mh in m_higgs:
-    print(mh)
-    print(mh_weight(mh))
-    print(np.where(m_higgs == mh))
-    print(m)
-    print(b)
-    print(a, d)
-    idx = np.where(m_higgs == mh)[0][0]
-    print(len(m_higgs) - idx - 1)
-    print(a + d * (len(m_higgs) - idx - 1))
-    print(np.__version__)
-    
     m_res = np.linspace(mres_min(mh), mres_min(mh) * 10, len(low_m_res), endpoint=False)
-    print(m_res)
     for mx in m_res:
         print('BulkGravitonToHH_MX%.0f_MH%.0f weight %.5f' % (mx, mh, mh_weight(mh)))
         generator.RandomizedParameters.append(

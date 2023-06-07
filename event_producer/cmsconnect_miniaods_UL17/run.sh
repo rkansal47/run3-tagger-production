@@ -5,7 +5,7 @@
 ## 2. no LHE step, also need to change externalLHEProducer to generator
 ## 3. seeds have width 100
 
-## in additinal to cmsconnect_higgs version:
+## in addition to cmsconnect_higgs version:
 ## 4. use custom cmssw (rsync from cvmfs)
 ## 5. download MG
 ## 6. use provided DIGI cfg
