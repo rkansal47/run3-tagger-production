@@ -17,7 +17,6 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
 
 import numpy as np
 
-
 # low mass list
 low_m_higgs = np.array([15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250])
 low_m_res = np.arange(600, 6000, 100)
@@ -36,7 +35,7 @@ num_high_points = len(m_higgs)
 m = np.array([[num_high_points, num_high_points * (num_high_points - 1) / 2], [1, num_high_points]])
 b = np.array([1, 1 / num_low_points])
 # a is smallest weight, d is spacing between weights
-a, d = np.linalg.inv(m).dot(b)
+a, d = np.linalg.solve(m, b)
 
 
 def mh_weight(mh):
@@ -60,9 +59,13 @@ for mh in m_higgs:
     print(mh)
     print(mh_weight(mh))
     print(np.where(m_higgs == mh))
+    print(m)
+    print(b)
     print(a, d)
+    idx = np.where(m_higgs == mh)[0][0]
     print(len(m_higgs) - idx - 1)
     print(a + d * (len(m_higgs) - idx - 1))
+    print(np.__version__)
     
     m_res = np.linspace(mres_min(mh), mres_min(mh) * 10, len(low_m_res), endpoint=False)
     print(m_res)
