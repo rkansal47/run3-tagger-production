@@ -28,12 +28,12 @@ m_higgs = np.arange(260, 660, 10)
 
 # reweight points such that there are the same number of events at 260 as 250 GeV
 # and then continuously decrease the weight from there till 650 GeV
-num_low_points = len(low_m_higgs)
-num_high_points = len(m_higgs)
+num_low_points = len(low_m_higgs).astype(float)
+num_high_points = len(m_higgs).astype(float)
 
 # solve system of equations s.t. 1) total weight sums to 1, and 2) the first weight is 1 / (# of low points) i.e. same # of events as 260 GeV
-m = np.array([[num_high_points, num_high_points * (num_high_points - 1) / 2], [1, num_high_points]]).astype(float)
-b = np.array([1, 1 / num_low_points]).astype(float)
+m = np.array([[num_high_points, num_high_points * (num_high_points - 1) / 2], [1, num_high_points]])
+b = np.array([1.0, 1.0 / num_low_points])
 # a is smallest weight, d is spacing between weights
 a, d = np.linalg.solve(m, b)
 
