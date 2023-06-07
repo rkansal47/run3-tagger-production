@@ -57,6 +57,13 @@ print(m_higgs)
 
 
 for mh in m_higgs:
+    print(mh)
+    print(mh_weight(mh))
+    print(np.where(m_higgs == mh))
+    print(a, d)
+    print(len(m_higgs) - idx - 1)
+    print(a + d * (len(m_higgs) - idx - 1))
+    
     m_res = np.linspace(mres_min(mh), mres_min(mh) * 10, len(low_m_res), endpoint=False)
     print(m_res)
     for mx in m_res:
