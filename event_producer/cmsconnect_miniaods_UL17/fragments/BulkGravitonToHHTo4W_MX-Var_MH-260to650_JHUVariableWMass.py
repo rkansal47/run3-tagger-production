@@ -28,8 +28,8 @@ m_higgs = np.arange(260, 660, 10)
 
 # reweight points such that there are the same number of events at 260 as 250 GeV
 # and then continuously decrease the weight from there till 650 GeV
-num_low_points = len(low_m_higgs).astype(float)
-num_high_points = len(m_higgs).astype(float)
+num_low_points = float(len(low_m_higgs))
+num_high_points = float(len(m_higgs))
 
 # solve system of equations s.t. 1) total weight sums to 1, and 2) the first weight is 1 / (# of low points) i.e. same # of events as 260 GeV
 m = np.array([[num_high_points, num_high_points * (num_high_points - 1) / 2], [1, num_high_points]])
@@ -52,7 +52,6 @@ def mres_min(mh):
 print("\n\n\n\nTESTING\n\n\n\n")
 
 print(m_higgs)
-
 
 
 for mh in m_higgs:
