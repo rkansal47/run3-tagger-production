@@ -28,12 +28,13 @@ env
 
 JOBNUM=${1##*=} # hard coded by crab
 NEVENT=${2##*=} # ordered by crab.py script
-NTHREAD=${3##*=} # ordered by crab.py script
-PROCNAME=${4##*=} # ordered by crab.py script
-BEGINSEED=${5##*=}
-EOSPATH=${6##*=}
-if ! [ -z "$7" ]; then
-  LHEPRODSCRIPT=${7##*=}
+NEVENTLUMIBLOCK=${3##*=} # ordered by crab.py script
+NTHREAD=${4##*=} # ordered by crab.py script
+PROCNAME=${5##*=} # ordered by crab.py script
+BEGINSEED=${6##*=}
+EOSPATH=${7##*=}
+if ! [ -z "$8" ]; then
+  LHEPRODSCRIPT=${8##*=}
 fi
 
 WORKDIR=`pwd`
@@ -97,7 +98,7 @@ SEED=$(((${BEGINSEED} + ${JOBNUM}) * 100))
 
 # need to specify seeds otherwise gridpacks will be chosen from the same routine!!
 # remember to identify process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" and externalLHEProducer->generator!!
-cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)" --step GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 # begin SIM
 cmsDriver.py --python_filename SIM_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --fileout file:sim.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --step SIM --geometry DB:Extended --filein file:lhegen.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;

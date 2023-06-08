@@ -1,10 +1,12 @@
 Universe   = vanilla
-Executable = run_and_transfer_nanogen_only.sh
+Executable = run_and_transfer.sh
 
 +ProjectName="cms.org.fnal"
 
 # custom args
-NEVENT = 10
+NEVENT = 250
+# this dictates how often the config will change (i.e., how often different H, X masses are sampled)
+NEVENTLUMIBLOCK = 10
 NTHREAD = 1
 PROCNAME = BulkGravitonToHHTo4W_MX-Var_MH-260to650_JHUVariableWMass
 EOSPATH = root://cmseos.fnal.gov//store/user/lpcdihiggsboost/MINIAOD/ParTSamples/v1/$(PROCNAME)/20UL17MiniAODv2/miniv2_$(Cluster)-$(Process).root
@@ -15,7 +17,7 @@ BEGINSEED = 232000
 # special LHE production configs for HWW/HZZ
 LHEPRODSCRIPT = run_instMG_JHUVariableWMassFixRatio.sh
 
-Arguments = $(JOBNUM) $(NEVENT) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
+Arguments = $(JOBNUM) $(NEVENT) $(NTHREAD) $(NEVENTLUMIBLOCK) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
 
 requirements = (OpSysAndVer =?= "CentOS7")
 request_cpus = 1
