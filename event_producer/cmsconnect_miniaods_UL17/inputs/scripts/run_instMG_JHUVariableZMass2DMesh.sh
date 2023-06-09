@@ -168,7 +168,7 @@ cd $WORKDIR
 
 if [ ! -f $INPUTDIR/JHUGenerator.tar.gz ]; then
   echo "Download JHUGen..."
-  curl https://spin.pha.jhu.edu/Generator/JHUGenerator.v7.5.0.tar.gz --output $INPUTDIR/JHUGenerator.tar.gz
+  xrdcp root://cmseos.fnal.gov//store/user/lpcdihiggsboost/MINIAOD/ParTSamples/JHUGenerator.v7.5.0.tar.gz $INPUTDIR/JHUGenerator.tar.gz
 fi
 tar xaf $INPUTDIR/JHUGenerator.tar.gz
 
