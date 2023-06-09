@@ -17,7 +17,7 @@ BEGINSEED = 232000
 # special LHE production configs for HWW/HZZ
 LHEPRODSCRIPT = run_instMG_JHUVariableWMassFixRatio.sh
 
-Arguments = $(JOBNUM) $(NEVENT) $(NTHREAD) $(NEVENTLUMIBLOCK) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
+Arguments = $(JOBNUM) $(NEVENT) $(NEVENTLUMIBLOCK) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
 
 requirements = (OpSysAndVer =?= "CentOS7")
 request_cpus = 1
