@@ -12,7 +12,7 @@ PROCNAME = BulkGravitonToHHTo4W_MX-Var_MH-260to650_JHUVariableWMass
 EOSPATH = root://cmseos.fnal.gov//store/user/lpcdihiggsboost/MINIAOD/ParTSamples/v1/$(PROCNAME)/20UL17MiniAODv2/miniv2_$(Cluster)-$(Process).root
 
 # note: use different seeds in different H->2prong and H->WW/ZZ routines to avoid overlap in LHE events
-BEGINSEED = 232000
+BEGINSEED = 232002
 
 # special LHE production configs for HWW/HZZ
 LHEPRODSCRIPT = run_instMG_JHUVariableWMassFixRatio.sh
@@ -34,4 +34,4 @@ should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_output_files   = dummy.cc
 
-Queue JOBNUM from seq 1 12000 |
+Queue JOBNUM from seq 1 24000 |

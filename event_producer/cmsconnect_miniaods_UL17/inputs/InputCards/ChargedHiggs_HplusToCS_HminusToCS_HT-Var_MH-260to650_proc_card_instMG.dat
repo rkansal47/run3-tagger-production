@@ -4,4 +4,4 @@ define j = p
 define all = j e+ mu+ e- mu- vl vl~
 generate p p > h+ h-, (h+ > c s~), (h- > c~ s)
 
-output ChargedHiggs_HplusToCS_HminusToCS_HT-800to8000_MH-260to650 -nojpeg
+output ChargedHiggs_HplusToCS_HminusToCS_HT-Var_MH-260to650 -nojpeg

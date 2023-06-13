@@ -12,7 +12,7 @@ EOSPATH = root://eoscms.cern.ch//store/cmst3/group/vhcc/sfTuples/$(PROCNAME)/20U
 # note: use different seeds in different H->2prong and H->WW/ZZ routines to avoid overlap in LHE events
 BEGINSEED = 9100000
 
-Arguments = $(JOBNUM) $(NEVENT) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH)
+Arguments = $(JOBNUM) $(NEVENT) $(NEVENTLUMIBLOCK) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT) $(EOSPATH)
 
 requirements = (OpSysAndVer =?= "CentOS7")
 request_cpus = 1
