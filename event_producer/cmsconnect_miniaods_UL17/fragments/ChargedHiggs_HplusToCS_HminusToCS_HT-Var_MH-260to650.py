@@ -55,8 +55,8 @@ for mh in m_higgs:
         generator.RandomizedParameters.append(
             cms.PSet(
                 ConfigWeight = cms.double(mh_weight(mh)),
-                GridpackPath =  cms.string('instMG://ChargedHiggs_HplusToCS_HminusToCS_HT-Var_MH-260to650/MG5_aMC_v2.6.5/%.0f:%.2f:%.0f' % (mh, mh / 100., m_res)),
-                ConfigDescription = cms.string('ChargedHiggs_HplusToCS_HminusToCS_MH%.0f_WH%.2f_HTmin%.0f' % (mh, mh / 100., m_res)),
+                GridpackPath =  cms.string('instMG://ChargedHiggs_HplusToCS_HminusToCS_HT-Var_MH-260to650/MG5_aMC_v2.6.5/%.0f:%.2f:%.0f' % (mh, mh / 100., mx)),
+                ConfigDescription = cms.string('ChargedHiggs_HplusToCS_HminusToCS_MH%.0f_WH%.2f_HTmin%.0f' % (mh, mh / 100., mx)),
                 PythiaParameters = cms.PSet(
                     pythia8CommonSettingsBlock,
                     pythia8CP5SettingsBlock,
