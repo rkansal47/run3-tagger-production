@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 
 INPUTFILES=$1
 ISTRAIN=$2
@@ -67,3 +67,4 @@ mv dnntuple.root ${WORKDIR}/dnntuple.root
 if ! [ -z "$EOSPATH" ]; then
   xrdcp --silent -p -f ${WORKDIR}/dnntuple.root $EOSPATH
 fi
+touch ${WORKDIR}/dummy.cc
