@@ -22,7 +22,7 @@ bash install_onnxruntime.sh
 rm -f install_onnxruntime.sh
 
 # clone this repo into "DeepNTuples" directory
-git clone https://github.com/colizz/DNNTuples.git DeepNTuples -b dev-UL-hww
+git clone https://github.com/colizz/DNNTuples.git DeepNTuples -b v8
 
 scram b -j8
 
