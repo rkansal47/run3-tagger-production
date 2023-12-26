@@ -1,13 +1,13 @@
 Universe   = vanilla
-Executable = run_dnntuples.sh
+Executable = run_dnntuples_AD.sh
 
 +ProjectName="cms.org.cern"
 
-PROCABBR = gghww
-PROCNAME = GluGluToH1JetToWW_HEFT_MH-15to250_JHUVariableWMass
+PROCABBR = AD_gghbb
+PROCNAME = GluGluHToBB_Pt-200ToInf_M-125_TuneCP5_MINLO_13TeV-powheg-pythia8
 
-CMSRUNARGS = 'isTrainSample=1 addLowLevel=0 addMET=1'
-EOSPATH = root://eoscms.cern.ch//store/cmst3/group/vhcc/sfTuples/dnntuples/v9/$(PROCNAME)/dnnTuples_$(Cluster)-$(Process).root
+CMSRUNARGS = 'isTrainSample=0 addLowLevel=0'
+EOSPATH = root://eoscms.cern.ch//store/cmst3/group/vhcc/sfTuples/dnntuples/v9-AD/$(PROCNAME)/dnnTuples_$(Cluster)-$(Process).root
 
 # cannot remove " because $(CMSRUNARGS) has white spaces in it
 Arguments = "$(Infiles) $(CMSRUNARGS) $(EOSPATH)"
