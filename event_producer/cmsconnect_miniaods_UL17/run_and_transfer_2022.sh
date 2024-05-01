@@ -99,7 +99,6 @@ SEED=$(((${BEGINSEED} + ${JOBNUM}) * 100))
 # remember to identify process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" and externalLHEProducer->generator!!
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22wmLHEGS-00228 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22wmLHEGS-00228 -> Get test command)
 cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step GEN --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py
 # TODO: check these flags:
 # --eventcontent RAWSIM,LHE 
 # --datatier GEN-SIM,LHE
@@ -111,29 +110,10 @@ cmsDriver.py --python_filename SIM_cfg.py --eventcontent RAWSIM --customise Conf
 
 # begin DRPremix
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
-cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-DIGI --fileout file:digi.root --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2 --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ; # > digi.log 2>&1 || exit $? ; # too many output, log into file 
+cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-DIGI --fileout file:hlt.root --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2022v12 --procModifiers premix_stage2 --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ; # > digi.log 2>&1 || exit $? ; # too many output, log into file 
 # TODO: check these flags:
-# --python_filename HIG-Run3Summer22DRPremix-00166_1_cfg.p
 # --datatier GEN-SIM-RAW
-# --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2022v12
 # --procModifiers premix_stage2,siPixelQualityRawToDigi
-
-# TODO: update and use the script below?
-# using provided DIGIPremix cfg
-# cmsRun inputs/scripts/DIGIPremix_UL2017_template_cfg.py maxEvents=$NEVENT nThreads=$NTHREAD
-
-# begin HLT
-# TODO: update flags or maybe merge with the previous step?
-# load new cmssw env
-if [ -r $RELEASE_HLT/src ] ; then
-  echo release $RELEASE_HLT already exists
-else
-  scram p CMSSW $RELEASE_HLT
-fi
-cd $RELEASE_HLT/src
-eval `scram runtime -sh`
-cd $WORKDIR
-cmsDriver.py --python_filename HLT_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --fileout file:hlt.root --conditions 94X_mc2017_realistic_v15 --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' --step HLT:2e34v40 --geometry DB:Extended --filein file:digi.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 # begin RECO
 # reload original env
@@ -143,32 +123,23 @@ cd $WORKDIR
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
 cmsDriver.py --python_filename RECO_cfg.py --eventcontent AODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --fileout file:reco.root --conditions 124X_mcRun3_2022_realistic_v12 --step RAW2DIGI,L1Reco,RECO,RECOSIM --geometry DB:Extended --filein file:hlt.root --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 # TODO: check these flags:
-# --python_filename HIG-Run3Summer22DRPremix-00166_2_cfg.py
 # --procModifiers siPixelQualityRawToDigi (add or not)
 # --no_exec (add or not)
 
-# # begin MiniAODv2
-# cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniv2.root --conditions 106X_mc2017_realistic_v9 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-
-## Run MiniAODv2 with -j FrameworkJobReport.xml 
+# begin MiniAOD
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22MiniAODv4-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22MiniAODv4-00101 -> Get test command)
-cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:mini.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run3,run3_miniAOD_12X --runUnscheduled --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:mini.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run3 --runUnscheduled --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 # TODO: check these flags
-# --python_filename HIG-Run3Summer22MiniAODv4-00101_1_cfg.py
 # --procModifiers run2_miniAOD_U (delete or not)
 # --era Run3,run3_miniAOD_12X
 # --runUnscheduled (delete or not)
 
-cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py
-# theirs: cmsRun -e -j $REPORT_NAME HIG-Run3Summer22MiniAODv4-00101_1_cfg.py || exit $? ;
-
 # begin NanoAOD
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
 cmsDriver.py --python_filename NanoAODv9_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --fileout file:nano.root --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --filein file:mini.root --era Run3 --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-cmsRun -j FrameworkJobReport.xml NanoAODv9_cfg.py # produce FrameworkJobReport.xml in the last step
-# TODO: check these flags
-# --python_filename HIG-Run3Summer22NanoAODv12-00101_1_cfg.py 
+# TODO: check this flag
 # --scenario pp (add or not)
+cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
 
 
 # Transfer file
