@@ -142,7 +142,7 @@ eval `scram runtime -sh`
 cd $WORKDIR
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
 cmsDriver.py --python_filename RECO_cfg.py --eventcontent AODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --fileout file:reco.root --conditions 124X_mcRun3_2022_realistic_v12 --step RAW2DIGI,L1Reco,RECO,RECOSIM --geometry DB:Extended --filein file:hlt.root --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# check these flags:
+# TODO: check these flags:
 # --python_filename HIG-Run3Summer22DRPremix-00166_2_cfg.py
 # --procModifiers siPixelQualityRawToDigi (add or not)
 # --no_exec (add or not)
@@ -150,15 +150,10 @@ cmsDriver.py --python_filename RECO_cfg.py --eventcontent AODSIM --customise Con
 # # begin MiniAODv2
 # cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniv2.root --conditions 106X_mc2017_realistic_v9 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
-# # begin NanoAODv9
-# cmsDriver.py --python_filename NanoAODv9_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --fileout file:nanov9.root --conditions 106X_mc2017_realistic_v9 --step NANO --filein file:miniv2.root --era Run2_2017,run2_nanoAOD_106Xv2 --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# cmsRun -j FrameworkJobReport.xml NanoAODv9_cfg.py # produce FrameworkJobReport.xml in the last step
-
-
 ## Run MiniAODv2 with -j FrameworkJobReport.xml 
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22MiniAODv4-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22MiniAODv4-00101 -> Get test command)
-cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniv2.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run3,run3_miniAOD_12X --runUnscheduled --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# check these flags
+cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:mini.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run3,run3_miniAOD_12X --runUnscheduled --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# TODO: check these flags
 # --python_filename HIG-Run3Summer22MiniAODv4-00101_1_cfg.py
 # --procModifiers run2_miniAOD_U (delete or not)
 # --era Run3,run3_miniAOD_12X
@@ -166,8 +161,18 @@ cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --cust
 
 cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py
 # theirs: cmsRun -e -j $REPORT_NAME HIG-Run3Summer22MiniAODv4-00101_1_cfg.py || exit $? ;
+
+# begin NanoAOD
+# modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
+cmsDriver.py --python_filename NanoAODv9_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --fileout file:nano.root --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --filein file:mini.root --era Run3 --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsRun -j FrameworkJobReport.xml NanoAODv9_cfg.py # produce FrameworkJobReport.xml in the last step
+# TODO: check these flags
+# --python_filename HIG-Run3Summer22NanoAODv12-00101_1_cfg.py 
+# --scenario pp (add or not)
+
+
 # Transfer file
-xrdcp --silent -p -f miniv2.root $EOSPATH
+xrdcp --silent -p -f nano.root $EOSPATH
 touch dummy.cc
 
 # ############ Start DNNTuples ############
