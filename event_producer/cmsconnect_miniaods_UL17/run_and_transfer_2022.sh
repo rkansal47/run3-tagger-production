@@ -144,8 +144,8 @@ cd $WORKDIR
 cmsDriver.py --python_filename RECO_cfg.py --eventcontent AODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --fileout file:reco.root --conditions 124X_mcRun3_2022_realistic_v12 --step RAW2DIGI,L1Reco,RECO,RECOSIM --geometry DB:Extended --filein file:hlt.root --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 # check these flags:
 # --python_filename HIG-Run3Summer22DRPremix-00166_2_cfg.py
-# --procModifiers siPixelQualityRawToDigi 
-# --no_exec
+# --procModifiers siPixelQualityRawToDigi (add or not)
+# --no_exec (add or not)
 
 # # begin MiniAODv2
 # cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniv2.root --conditions 106X_mc2017_realistic_v9 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
@@ -156,9 +156,16 @@ cmsDriver.py --python_filename RECO_cfg.py --eventcontent AODSIM --customise Con
 
 
 ## Run MiniAODv2 with -j FrameworkJobReport.xml 
-cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniv2.root --conditions 106X_mc2017_realistic_v9 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run2_2017 --runUnscheduled --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py
+# modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22MiniAODv4-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22MiniAODv4-00101 -> Get test command)
+cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniv2.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run3,run3_miniAOD_12X --runUnscheduled --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# check these flags
+# --python_filename HIG-Run3Summer22MiniAODv4-00101_1_cfg.py
+# --procModifiers run2_miniAOD_U (delete or not)
+# --era Run3,run3_miniAOD_12X
+# --runUnscheduled (delete or not)
 
+cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py
+# theirs: cmsRun -e -j $REPORT_NAME HIG-Run3Summer22MiniAODv4-00101_1_cfg.py || exit $? ;
 # Transfer file
 xrdcp --silent -p -f miniv2.root $EOSPATH
 touch dummy.cc
