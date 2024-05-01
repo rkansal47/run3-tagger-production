@@ -99,19 +99,31 @@ SEED=$(((${BEGINSEED} + ${JOBNUM}) * 100))
 # remember to identify process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" and externalLHEProducer->generator!!
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22wmLHEGS-00228 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22wmLHEGS-00228 -> Get test command)
 cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step GEN --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py
+# TODO: check these flags:
+# --eventcontent RAWSIM,LHE 
+# --datatier GEN-SIM,LHE
 
 # begin SIM
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22wmLHEGS-00228 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22wmLHEGS-00228 -> Get test command)
 cmsDriver.py --python_filename SIM_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --step SIM --geometry DB:Extended --filein file:lhegen.root --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# TODO: use a different reference?
 
 # begin DRPremix
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
-cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-DIGI --fileout file:digi.root --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2 --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT > digi.log 2>&1 || exit $? ; # too many output, log into file 
-# TODO: update the script below?
+cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-DIGI --fileout file:digi.root --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2 --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ; # > digi.log 2>&1 || exit $? ; # too many output, log into file 
+# TODO: check these flags:
+# --python_filename HIG-Run3Summer22DRPremix-00166_1_cfg.p
+# --datatier GEN-SIM-RAW
+# --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2022v12
+# --procModifiers premix_stage2,siPixelQualityRawToDigi
+
+# TODO: update and use the script below?
 # using provided DIGIPremix cfg
 # cmsRun inputs/scripts/DIGIPremix_UL2017_template_cfg.py maxEvents=$NEVENT nThreads=$NTHREAD
 
 # begin HLT
+# TODO: update flags
 # load new cmssw env
 if [ -r $RELEASE_HLT/src ] ; then
   echo release $RELEASE_HLT already exists
@@ -124,6 +136,7 @@ cd $WORKDIR
 cmsDriver.py --python_filename HLT_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --fileout file:hlt.root --conditions 94X_mc2017_realistic_v15 --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' --step HLT:2e34v40 --geometry DB:Extended --filein file:digi.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 # begin RECO
+# TODO: update flags
 # reload original env
 cd ${CMSSW_BASE_ORIG}/src
 eval `scram runtime -sh`
