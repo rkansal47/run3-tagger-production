@@ -38,7 +38,7 @@ fi
 
 WORKDIR=`pwd`
 
-export SCRAM_ARCH=slc7_amd64_gcc700
+export SCRAM_ARCH=el8_amd64_gcc11
 export RELEASE=CMSSW_10_6_30
 export RELEASE_HLT=CMSSW_9_4_14_UL_patch1
 source /cvmfs/cms.cern.ch/cmsset_default.sh
@@ -133,17 +133,19 @@ cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --cust
 # --procModifiers run2_miniAOD_U (delete or not)
 # --era Run3,run3_miniAOD_12X
 # --runUnscheduled (delete or not)
+cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py # produce FrameworkJobReport.xml in the last step
 
-# begin NanoAOD
-# modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
-cmsDriver.py --python_filename NanoAODv9_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --fileout file:nano.root --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --filein file:mini.root --era Run3 --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# TODO: check this flag
-# --scenario pp (add or not)
-cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
+
+# # begin NanoAOD
+# # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
+# cmsDriver.py --python_filename NanoAODv9_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --fileout file:nano.root --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --filein file:mini.root --era Run3 --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# # TODO: check this flag
+# # --scenario pp (add or not)
+# cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
 
 
 # Transfer file
-xrdcp --silent -p -f nano.root $EOSPATH
+xrdcp --silent -p -f mini.root $EOSPATH
 touch dummy.cc
 
 # ############ Start DNNTuples ############
