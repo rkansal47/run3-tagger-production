@@ -39,8 +39,8 @@ fi
 WORKDIR=`pwd`
 
 export SCRAM_ARCH=el8_amd64_gcc11
-export RELEASE=CMSSW_10_6_30
-export RELEASE_HLT=CMSSW_9_4_14_UL_patch1
+export RELEASE=CMSSW_13_0_13
+export RELEASE_HLT=CMSSW_12_4_14_patch3
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 if [ -r $RELEASE/src ] ; then
