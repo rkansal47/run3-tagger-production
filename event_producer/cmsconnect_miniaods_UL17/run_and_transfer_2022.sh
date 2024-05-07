@@ -11,7 +11,7 @@
 ## 6. use provided DIGI cfg
 ## 7. stop running dnntuples
 
-sleep $(( ( RANDOM % 200 ) + 1 ))
+# sleep $(( ( RANDOM % 200 ) + 1 ))
 
 wget --tries=3 https://github.com/colizz/hww-tagging/archive/refs/heads/dev-miniaods.tar.gz
 tar xaf dev-miniaods.tar.gz
@@ -38,44 +38,60 @@ fi
 
 WORKDIR=`pwd`
 
-export SCRAM_ARCH=el8_amd64_gcc11
-export RELEASE=CMSSW_13_0_13
-export RELEASE_HLT=CMSSW_12_4_14_patch3
+export SCRAM_ARCH=el8_amd64_gcc10
+export RELEASE_BASE=CMSSW_12_4_14_patch3
+export RELEASE_MINIAOD=CMSSW_13_0_13
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
-if [ -r $RELEASE/src ] ; then
-  echo release $RELEASE already exists
+if [ -r $RELEASE_BASE/src ] ; then
+  echo release $RELEASE_BASE already exists
 else
-  scram p CMSSW $RELEASE
+  scram p CMSSW $RELEASE_BASE
 fi
-cd $RELEASE/src
-eval `scram runtime -sh`
+
 CMSSW_BASE_ORIG=${CMSSW_BASE}
 
-# customize CMSSW code
+# # # customize CMSSW code
+# mkdir $CMSSW_BASE/src/GeneratorInterface
+# # cp -rf /cvmfs/cms.cern.ch/$SCRAM_ARCH/cms/cmssw/$CMSSW_VERSION/src/GeneratorInterface/{Core,LHEInterface} $CMSSW_BASE/src/GeneratorInterface/
+# # copy customized LHE production script
+# cp -f $WORKDIR/inputs/scripts/{lhe_modifier.py,run_instMG.sh} GeneratorInterface/LHEInterface/data/
+# # use customized LHE production script, if specified
+# if ! [ -z $LHEPRODSCRIPT ]; then
+#   cp -f $WORKDIR/inputs/scripts/$LHEPRODSCRIPT GeneratorInterface/LHEInterface/data/
+#   sed -i "s|run_generic_tarball_cvmfs.sh|${LHEPRODSCRIPT}|g" GeneratorInterface/Core/src/BaseHadronizer.cc
+# else
+#   sed -i "s|run_generic_tarball_cvmfs.sh|run_instMG.sh|g" GeneratorInterface/Core/src/BaseHadronizer.cc
+# fi
 
-mkdir $CMSSW_BASE/src/GeneratorInterface
-cp -rf /cvmfs/cms.cern.ch/$SCRAM_ARCH/cms/cmssw/$CMSSW_VERSION/src/GeneratorInterface/{Core,LHEInterface} $CMSSW_BASE/src/GeneratorInterface/
-# copy customized LHE production script
-cp -f $WORKDIR/inputs/scripts/{lhe_modifier.py,run_instMG.sh} GeneratorInterface/LHEInterface/data/
-# use customized LHE production script, if specified
-if ! [ -z $LHEPRODSCRIPT ]; then
-  cp -f $WORKDIR/inputs/scripts/$LHEPRODSCRIPT GeneratorInterface/LHEInterface/data/
-  sed -i "s|run_generic_tarball_cvmfs.sh|${LHEPRODSCRIPT}|g" GeneratorInterface/Core/src/BaseHadronizer.cc
-else
-  sed -i "s|run_generic_tarball_cvmfs.sh|run_instMG.sh|g" GeneratorInterface/Core/src/BaseHadronizer.cc
+# # copy the fragment
+# mkdir -p Configuration/GenProduction/python/
+# cp $WORKDIR/fragments/${PROCNAME}.py Configuration/GenProduction/python/${PROCNAME}.py
+# # replace the event number
+# # NOTE: this routine does not specify NEVENT in the fragment
+# # grep -q "__NEVENT__" Configuration/GenProduction/python/${PROCNAME}.py || exit $? ;
+# sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/${PROCNAME}.py
+# eval `scram runtime -sh`
+# scram b -j $NTHREAD
+
+
+# Download fragment from McM
+mkdir -p Configuration/GenProduction/python/
+curl -s -k https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_fragment/HIG-Run3Summer22wmLHEGS-00228 --retry 3 --create-dirs -o Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py
+[ -s Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py ] || exit $?;
+
+# Check if fragment contais gridpack path ant that it is in cvmfs
+if grep -q "gridpacks" Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py; then
+  if ! grep -q "/cvmfs/cms.cern.ch/phys_generator/gridpacks" Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py; then
+    echo "Gridpack inside fragment is not in cvmfs."
+    exit -1
+  fi
 fi
 
-# copy the fragment
-mkdir -p Configuration/GenProduction/python/
-cp $WORKDIR/fragments/${PROCNAME}.py Configuration/GenProduction/python/${PROCNAME}.py
-# replace the event number
-# NOTE: this routine does not specify NEVENT in the fragment
-# grep -q "__NEVENT__" Configuration/GenProduction/python/${PROCNAME}.py || exit $? ;
-sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/${PROCNAME}.py
+cd $RELEASE_BASE/src
 eval `scram runtime -sh`
+cp -r $WORKDIR/Configuration .
 scram b -j $NTHREAD
-
 cd $WORKDIR
 
 # following workflows 20UL chain
@@ -86,62 +102,54 @@ cd $WORKDIR
 # SEED=$((${BEGINSEED} + ${JOBNUM}))
 SEED=$(((${BEGINSEED} + ${JOBNUM}) * 100))
 
-## NanoGEN
-# cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGENNANO_cfg.py --eventcontent NANOAODGEN --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAOD --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)" --fileout file:lhegennano.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --step LHE,GEN,NANOGEN --geometry DB:Extended --era Run2_2017 --mc -n $NEVENT --nThreads $NTHREAD || exit $? ;
-## Framework job
-# cmsRun -j FrameworkJobReport.xml wmLHEGENNANO_cfg.py
-## Transfer
-# xrdcp --silent -p -f lhegennano.root $EOSPATH
-# touch dummy.cc
-# if, NanoGEN, comment everything else below
 
+## NanoGEN
 # need to specify seeds otherwise gridpacks will be chosen from the same routine!!
 # remember to identify process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" and externalLHEProducer->generator!!
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22wmLHEGS-00228 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22wmLHEGS-00228 -> Get test command)
-cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step GEN --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step GEN,LHE,SIM --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 # TODO: check these flags:
 # --eventcontent RAWSIM,LHE 
 # --datatier GEN-SIM,LHE
+# --step LHE,GEN,SIM
+cmsDriver.py Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# TODO: different fragment?
 
-# begin SIM
-# modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22wmLHEGS-00228 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22wmLHEGS-00228 -> Get test command)
-cmsDriver.py --python_filename SIM_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --step SIM --geometry DB:Extended --filein file:lhegen.root --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# TODO: use a different reference?
 
-# begin DRPremix
+# begin DRPremix and HLT
+# load new cmssw env
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
-cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-DIGI --fileout file:hlt.root --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2022v12 --procModifiers premix_stage2 --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ; # > digi.log 2>&1 || exit $? ; # too many output, log into file 
-# TODO: check these flags:
-# --datatier GEN-SIM-RAW
-# --procModifiers premix_stage2,siPixelQualityRawToDigi
+cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --fileout file:hlt.root --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2022v12 --procModifiers premix_stage2,siPixelQualityRawToDigi --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run3 --mc --nThreads $NTHREAD -n $NEVENT > digi.log 2>&1 || exit $? ; # too many output, log into file 
 
 # begin RECO
 # reload original env
-cd ${CMSSW_BASE_ORIG}/src
-eval `scram runtime -sh`
-cd $WORKDIR
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
-cmsDriver.py --python_filename RECO_cfg.py --eventcontent AODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --fileout file:reco.root --conditions 124X_mcRun3_2022_realistic_v12 --step RAW2DIGI,L1Reco,RECO,RECOSIM --geometry DB:Extended --filein file:hlt.root --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# TODO: check these flags:
-# --procModifiers siPixelQualityRawToDigi (add or not)
-# --no_exec (add or not)
+cmsDriver.py --python_filename RECO_cfg.py --eventcontent AODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --fileout file:reco.root --conditions 124X_mcRun3_2022_realistic_v12 --procModifiers siPixelQualityRawToDigi --step RAW2DIGI,L1Reco,RECO,RECOSIM --geometry DB:Extended --filein file:hlt.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 # begin MiniAOD
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22MiniAODv4-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22MiniAODv4-00101 -> Get test command)
-cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:mini.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run3 --runUnscheduled --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# TODO: check these flags
-# --procModifiers run2_miniAOD_U (delete or not)
-# --era Run3,run3_miniAOD_12X
-# --runUnscheduled (delete or not)
-cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py # produce FrameworkJobReport.xml in the last step
+export SCRAM_ARCH=el8_amd64_gcc11
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r $RELEASE_MINIAOD/src ] ; then
+  echo release $RELEASE_MINIAOD already exists
+else
+  scram p CMSSW $RELEASE_MINIAOD
+fi
+cd CMSSW_13_0_13/src
+eval `scram runtime -sh`
+
+cp -r $WORKDIR/Configuration .
+scram b
+cd $WORKDIR
+
+cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:mini.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --geometry DB:Extended --filein file:reco.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+# cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py # produce FrameworkJobReport.xml in the last step
 
 
-# # begin NanoAOD
-# # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
-# cmsDriver.py --python_filename NanoAODv9_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --fileout file:nano.root --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --filein file:mini.root --era Run3 --no_exec --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# # TODO: check this flag
-# # --scenario pp (add or not)
-# cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
+# begin NanoAOD
+# modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
+cmsDriver.py --python_filename NanoAOD_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --fileout file:nano.root --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --scenario pp --filein file:mini.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
 
 
 # Transfer file
@@ -151,17 +159,22 @@ touch dummy.cc
 # ############ Start DNNTuples ############
 # # use CMSSW_11_1_0_pre8 which has Puppi V14
 # export SCRAM_ARCH=slc7_amd64_gcc820
-# scram p CMSSW CMSSW_11_1_0_pre8
-# cd CMSSW_11_1_0_pre8/src
+# export RELEASE_DNN=CMSSW_11_1_0_pre8
+# if [ -r $RELEASE_DNN/src ] ; then
+#   echo release $RELEASE_DNN already exists
+# else
+#   scram p CMSSW $RELEASE_DNN
+# fi
+# cd $RELEASE_DNN/src
 # eval `scram runtime -sh`
 
 # git cms-addpkg PhysicsTools/ONNXRuntime
 # # clone this repo into "DeepNTuples" directory
 # git clone https://github.com/colizz/DNNTuples.git DeepNTuples -b dev-UL-hww
 # # Use a faster version of ONNXRuntime
-# $CMSSW_BASE/src/DeepNTuples/Ntupler/scripts/install_onnxruntime.sh
+# DeepNTuples/Ntupler/scripts/install_onnxruntime.sh
 # scram b -j $NTHREAD
 
 # # Must run inside the test folder..
 # cd DeepNTuples/Ntupler/test/
-# cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/miniv2.root outputFile=${WORKDIR}/dnntuple.root
+# cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/mini.root outputFile=${WORKDIR}/dnntuple.root
