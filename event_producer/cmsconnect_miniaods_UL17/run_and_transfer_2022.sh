@@ -107,13 +107,7 @@ SEED=$(((${BEGINSEED} + ${JOBNUM}) * 100))
 # need to specify seeds otherwise gridpacks will be chosen from the same routine!!
 # remember to identify process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" and externalLHEProducer->generator!!
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22wmLHEGS-00228 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22wmLHEGS-00228 -> Get test command)
-# cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step GEN,LHE,SIM --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# TODO: check these flags:
-# --eventcontent RAWSIM,LHE 
-# --datatier GEN-SIM,LHE
-# --step LHE,GEN,SIM
 cmsDriver.py Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-# TODO: different fragment?
 
 
 # begin DRPremix and HLT
@@ -135,7 +129,7 @@ if [ -r $RELEASE_MINIAOD/src ] ; then
 else
   scram p CMSSW $RELEASE_MINIAOD
 fi
-cd CMSSW_13_0_13/src
+cd $RELEASE_MINIAOD/src
 eval `scram runtime -sh`
 
 cp -r $WORKDIR/Configuration .
@@ -152,29 +146,38 @@ cmsDriver.py --python_filename NanoAOD_cfg.py --eventcontent NANOAODSIM --custom
 cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
 
 
-# Transfer file
+# Transfer files
 xrdcp --silent -p -f mini.root $EOSPATH
-touch dummy.cc
+xrdcp --silent -p -f nano.root $EOSPATH
 
 # ############ Start DNNTuples ############
-# # use CMSSW_11_1_0_pre8 which has Puppi V14
-# export SCRAM_ARCH=slc7_amd64_gcc820
-# export RELEASE_DNN=CMSSW_11_1_0_pre8
+# cd $WORKDIR;
+# mkdir -p dnn_test;
+# cd dnn_test;
+# DNNDIR=`pwd`
+
+# export SCRAM_ARCH=el8_amd64_gcc11
+# export RELEASE_DNN=CMSSW_13_0_13
 # if [ -r $RELEASE_DNN/src ] ; then
 #   echo release $RELEASE_DNN already exists
 # else
 #   scram p CMSSW $RELEASE_DNN
 # fi
+
 # cd $RELEASE_DNN/src
 # eval `scram runtime -sh`
 
 # git cms-addpkg PhysicsTools/ONNXRuntime
 # # clone this repo into "DeepNTuples" directory
-# git clone https://github.com/colizz/DNNTuples.git DeepNTuples -b dev-UL-hww
+# if ! [ -d DeepNTuples ]; then
+#   git clone https://github.com/zichunhao/DNNTuples.git DeepNTuples -b dev-UL-hww
+# fi
 # # Use a faster version of ONNXRuntime
-# DeepNTuples/Ntupler/scripts/install_onnxruntime.sh
+# curl -s --retry 10 https://coli.web.cern.ch/coli/tmp/.230626-003937_partv2_model/ak8/V02-HidLayer/model_embed.onnx -o $CMSSW_BASE/src/DeepNTuples/Ntupler/data/InclParticleTransformer-MD/ak8/V02-HidLayer/model_embed.onnx
 # scram b -j $NTHREAD
 
 # # Must run inside the test folder..
 # cd DeepNTuples/Ntupler/test/
-# cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/mini.root outputFile=${WORKDIR}/dnntuple.root
+# cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/mini.root outputFile=${DNNDIR}/dnntuple.root
+
+# cd $WORKDIR
