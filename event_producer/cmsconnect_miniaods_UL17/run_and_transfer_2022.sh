@@ -25,7 +25,9 @@ mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
 
 # gridpack
-# TODO: Maybe we need to regenerate
+# Note: No update 13.6 TeV (from 13.0 TeV) for the following reasons. 
+# 1. The training is jet-based, so the event energy will not be important.
+# 2. Keeping the energy the same will be helpful, as we may expect similar jet pT/mass distributions between Run2 and Run3 samples.
 xrdcp -f root://cmseos.fnal.gov//store/user/lpcdihiggsboost/MINIAOD/ParTSamples/MG5_aMC_v2.6.5.tar.gz inputs/MG5_aMC_v2.6.5.tar.gz
 
 if [ -d /afs/cern.ch/user/${USER:0:1}/$USER ]; then
@@ -123,14 +125,18 @@ SEED=$(((${BEGINSEED} + ${JOBNUM}) * 100))
 # remember to identify process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" and externalLHEProducer->generator!!
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22wmLHEGS-00228 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22wmLHEGS-00228 -> Get test command)
 # cmsDriver.py Configuration/GenProduction/python/HIG-Run3Summer22wmLHEGS-00228-fragment.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
-cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsDriver.py Configuration/GenProduction/python/${PROCNAME}.py --python_filename wmLHEGEN_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.generator.initialSeed="int(${SEED})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${NEVENTLUMIBLOCK})" --step GEN --geometry DB:Extended --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+
+# begin SIM
+cmsDriver.py --python_filename SIM_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --fileout file:sim.root --conditions 124X_mcRun3_2022_realistic_v12 --beamspot Realistic25ns13p6TeVEarly2022Collision --step SIM --geometry DB:Extended --filein file:lhegen.root --era Run3 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 
-# begin DRPremix and HLT
-# load new cmssw env
+#  DRPremix
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
 cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2,siPixelQualityRawToDigi --geometry DB:Extended --filein file:sim.root --fileout file:digi.root --datamix PreMix --era Run3 --mc --nThreads $NTHREAD -n $NEVENT > digi.log 2>&1 || exit $? ; # too many output, log into file 
 
+# HLT
+# load new cmssw env
 if [ -r $RELEASE_HLT/src ] ; then
   echo release $RELEASE_HLT already exists
 else
@@ -175,39 +181,41 @@ cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --cust
 cmsDriver.py --python_filename NanoAOD_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --scenario pp --filein file:mini.root --fileout file:nano.root --era Run3 --mc --no_exec --nThreads $NTHREAD -n $NEVENT || exit $? ;
 cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
 
+############ Start DNNTuples ############
+cd $WORKDIR;
+mkdir -p dnn_test;
+cd dnn_test;
+DNNDIR=`pwd`
+
+export SCRAM_ARCH=el8_amd64_gcc11
+export RELEASE_DNN=CMSSW_13_0_13
+if [ -r $RELEASE_DNN/src ] ; then
+  echo release $RELEASE_DNN already exists
+else
+  scram p CMSSW $RELEASE_DNN
+fi
+
+cd $RELEASE_DNN/src
+eval `scram runtime -sh`
+
+git cms-addpkg PhysicsTools/ONNXRuntime
+# clone this repo into "DeepNTuples" directory
+if ! [ -d DeepNTuples ]; then
+  git clone https://github.com/zichunhao/DNNTuples.git DeepNTuples -b dev-UL-hww
+fi
+# Use a faster version of ONNXRuntime
+curl -s --retry 10 https://coli.web.cern.ch/coli/tmp/.230626-003937_partv2_model/ak8/V02-HidLayer/model_embed.onnx -o $CMSSW_BASE/src/DeepNTuples/Ntupler/data/InclParticleTransformer-MD/ak8/V02-HidLayer/model_embed.onnx
+scram b -j $NTHREAD
+
+# Must run inside the test folder..
+cd DeepNTuples/Ntupler/test/
+cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/mini.root outputFile=${WORKDIR}/dnntuple.root
+
+cd $WORKDIR
 
 # Transfer files
 xrdcp --silent -p -f mini.root $EOSPATH
 xrdcp --silent -p -f nano.root $EOSPATH
+xrdcp --silent -p -f dnntuple.root $EOSPATH
 
-# ############ Start DNNTuples ############
-# cd $WORKDIR;
-# mkdir -p dnn_test;
-# cd dnn_test;
-# DNNDIR=`pwd`
-
-# export SCRAM_ARCH=el8_amd64_gcc11
-# export RELEASE_DNN=CMSSW_13_0_13
-# if [ -r $RELEASE_DNN/src ] ; then
-#   echo release $RELEASE_DNN already exists
-# else
-#   scram p CMSSW $RELEASE_DNN
-# fi
-
-# cd $RELEASE_DNN/src
-# eval `scram runtime -sh`
-
-# git cms-addpkg PhysicsTools/ONNXRuntime
-# # clone this repo into "DeepNTuples" directory
-# if ! [ -d DeepNTuples ]; then
-#   git clone https://github.com/zichunhao/DNNTuples.git DeepNTuples -b dev-UL-hww
-# fi
-# # Use a faster version of ONNXRuntime
-# curl -s --retry 10 https://coli.web.cern.ch/coli/tmp/.230626-003937_partv2_model/ak8/V02-HidLayer/model_embed.onnx -o $CMSSW_BASE/src/DeepNTuples/Ntupler/data/InclParticleTransformer-MD/ak8/V02-HidLayer/model_embed.onnx
-# scram b -j $NTHREAD
-
-# # Must run inside the test folder..
-# cd DeepNTuples/Ntupler/test/
-# cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/mini.root outputFile=${DNNDIR}/dnntuple.root
-
-# cd $WORKDIR
+echo "All done!"
