@@ -46,6 +46,8 @@ if ! [ -z "$8" ]; then
   LHEPRODSCRIPT=${8##*=}
 fi
 
+eosmkdir -p $EOSPATH
+
 WORKDIR=`pwd`
 
 export SCRAM_ARCH=el8_amd64_gcc10
@@ -175,7 +177,6 @@ cd $WORKDIR
 cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --geometry DB:Extended --filein file:reco.root --fileout file:mini.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 # cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py # produce FrameworkJobReport.xml in the last step
 
-
 # begin NanoAOD
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
 cmsDriver.py --python_filename NanoAOD_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --scenario pp --filein file:mini.root --fileout file:nano.root --era Run3 --mc --no_exec --nThreads $NTHREAD -n $NEVENT || exit $? ;
@@ -218,4 +219,5 @@ xrdcp --silent -p -f mini.root $EOSPATH
 xrdcp --silent -p -f nano.root $EOSPATH
 xrdcp --silent -p -f dnntuple.root $EOSPATH
 
+touch dummy.cc
 echo "All done!"
