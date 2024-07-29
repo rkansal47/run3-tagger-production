@@ -20,8 +20,13 @@
 
 wget --tries=3 https://github.com/colizz/hww-tagging/archive/refs/heads/dev-miniaods.tar.gz
 tar xaf dev-miniaods.tar.gz
-# mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
-mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
+# check if fragment directory exists
+if ! [ -d fragments ]; then
+  mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
+else
+  mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
+fi
+
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
 
 # gridpack
@@ -46,9 +51,20 @@ if ! [ -z "$8" ]; then
   LHEPRODSCRIPT=${8##*=}
 fi
 
-eosmkdir -p $EOSPATH
 
 WORKDIR=`pwd`
+
+if ! [ -f {WORKDIR}/fragments/${PROCNAME}.py ]; then
+  echo "Trying to find the fragment ${PROCNAME}.py in the current directory ${WORKDIR}"
+  ls -lah
+  if [ -f ${PROCNAME}.py ]; then
+    # quick hack to move the fragment to the right place
+    mv ${PROCNAME}.py fragments/${PROCNAME}.py
+  else
+    echo "Fragment ${PROCNAME}.py does not exist."
+    exit -1
+  fi
+fi
 
 export SCRAM_ARCH=el8_amd64_gcc10
 # export RELEASE_BASE=CMSSW_12_4_14_patch3
@@ -215,9 +231,9 @@ cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/mini.root outputFile=${WOR
 cd $WORKDIR
 
 # Transfer files
-xrdcp --silent -p -f mini.root $EOSPATH
-xrdcp --silent -p -f nano.root $EOSPATH
-xrdcp --silent -p -f dnntuple.root $EOSPATH
+xrdcp --silent -p -f mini.root $EOSPATH/mini_${JOBNUM}.root
+xrdcp --silent -p -f nano.root $EOSPATH/nano_${JOBNUM}.root
+xrdcp --silent -p -f dnntuple.root $EOSPATH/dnntuple_${JOBNUM}.root
 
 touch dummy.cc
 echo "All done!"
