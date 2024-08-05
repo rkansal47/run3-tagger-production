@@ -1,5 +1,5 @@
 Universe   = vanilla
-Executable = run_and_transfer.sh
+Executable = run_and_transfer_2022.sh
 
 +ProjectName="cms.org.cern"
 
@@ -21,7 +21,7 @@ EOSPATH = /eos/user/z/zichun/higgs/GloParT/hbb-samples/GluGluToBulkGravitonToHHT
 
 Arguments = $(JOBNUM) $(NEVENT) $(NEVENTLUMIBLOCK) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
 
-requirements = (OpSysAndVer =?= "CentOS7")
+requirements = (OpSysAndVer =?= "AlmaLinux9")
 request_cpus = 1
 request_memory = 2000
 use_x509userproxy = true
