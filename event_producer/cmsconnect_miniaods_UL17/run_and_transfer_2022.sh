@@ -54,15 +54,17 @@ fi
 
 WORKDIR=`pwd`
 
-if ! [ -f {WORKDIR}/fragments/${PROCNAME}.py ]; then
+if [ ! -f "${WORKDIR}/fragments/${PROCNAME}.py" ]; then
   echo "Trying to find the fragment ${PROCNAME}.py in the current directory ${WORKDIR}"
   ls -lah
-  if [ -f ${PROCNAME}.py ]; then
-    # quick hack to move the fragment to the right place
-    mv ${PROCNAME}.py fragments/${PROCNAME}.py
+  if [ -f "${PROCNAME}.py" ]; then
+    # Ensure the fragments directory exists
+    mkdir -p "${WORKDIR}/fragments"
+    # Move the fragment to the right place
+    mv "${PROCNAME}.py" "${WORKDIR}/fragments"
   else
     echo "Fragment ${PROCNAME}.py does not exist."
-    exit -1
+    exit 1
   fi
 fi
 
