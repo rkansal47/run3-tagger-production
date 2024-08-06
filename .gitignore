@@ -1,0 +1,10 @@
+event_producer/cmsconnect_miniaods_UL17/CMSSW*/
+event_producer/cmsconnect_miniaods_UL17/log/
+event_producer/cmsconnect_miniaods_UL17/inputs/
+event_producer/cmsconnect_miniaods_UL17/dnn_test/
+event_producer/cmsconnect_miniaods_UL17/hww-tagging-dev-miniaods/
+event_producer/cmsconnect_miniaods_UL17/dummy.cc
+event_producer/cmsconnect_miniaods_UL17/*.tar.gz
+event_producer/cmsconnect_miniaods_UL17/*.py
+*.root
+*.log
