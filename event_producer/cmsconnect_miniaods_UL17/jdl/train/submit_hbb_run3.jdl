@@ -24,6 +24,7 @@ Arguments = $(JOBNUM) $(NEVENT) $(NEVENTLUMIBLOCK) $(NTHREAD) $(PROCNAME) $(BEGI
 requirements = (OpSysAndVer =?= "AlmaLinux9")
 request_cpus = 1
 request_memory = 2000
+x509userproxy = $ENV(X509_USER_PROXY)
 use_x509userproxy = true
 
 +JobFlavour = "tomorrow"
