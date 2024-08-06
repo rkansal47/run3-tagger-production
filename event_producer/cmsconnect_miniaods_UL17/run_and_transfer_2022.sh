@@ -68,6 +68,11 @@ if [ ! -f "${WORKDIR}/fragments/${PROCNAME}.py" ]; then
   fi
 fi
 
+if [ -f "${PROCNAME}.py" ]; then
+  # quick hack to move the custom fragment to the right place
+  mv -f "${PROCNAME}.py" "${WORKDIR}/fragments"
+fi
+
 export SCRAM_ARCH=el8_amd64_gcc10
 # export RELEASE_BASE=CMSSW_12_4_14_patch3
 export RELEASE_BASE=CMSSW_12_6_5
