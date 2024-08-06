@@ -26,6 +26,7 @@ if ! [ -d fragments ]; then
 else
   mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
 fi
+cd hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17
 
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
 
@@ -61,7 +62,7 @@ if [ ! -f "${WORKDIR}/fragments/${PROCNAME}.py" ]; then
     # Ensure the fragments directory exists
     mkdir -p "${WORKDIR}/fragments"
     # Move the fragment to the right place
-    mv "${PROCNAME}.py" "${WORKDIR}/fragments"
+    mv -f "${PROCNAME}.py" "${WORKDIR}/fragments"
   else
     echo "Fragment ${PROCNAME}.py does not exist."
     exit 1
