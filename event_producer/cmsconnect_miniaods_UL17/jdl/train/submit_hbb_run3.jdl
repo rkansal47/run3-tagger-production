@@ -4,11 +4,11 @@ Executable = run_and_transfer_2022.sh
 +ProjectName="cms.org.cern"
 
 # custom args
-NEVENT = 100
+NEVENT = 500
 NTHREAD = 2
 PROCNAME = GluGluToBulkGravitonToHHTo4QGluLTau_MH-50-125-250-300_HighPt_narrow
 # this dictates how often the config will change (i.e., how often different H, X masses are sampled)
-NEVENTLUMIBLOCK = 100
+NEVENTLUMIBLOCK = 10
 
 # note: use different seeds in different H->2prong and H->WW/ZZ routines to avoid overlap in LHE events
 BEGINSEED = 400000
@@ -17,7 +17,7 @@ BEGINSEED = 400000
 LHEPRODSCRIPT =
 
 # EOS path to store the output
-EOSPATH = /eos/user/z/zichun/higgs/GloParT/hbb-samples/GluGluToBulkGravitonToHHTo4QGluLTau_MH-50-125-250-300_HighPt_narrow
+EOSPATH = root://eosuser.cern.ch//eos/user/z/zichun/higgs/GloParT/hbb-samples/GluGluToBulkGravitonToHHTo4QGluLTau_MH-50-125-250-300_HighPt_narrow
 
 Arguments = $(JOBNUM) $(NEVENT) $(NEVENTLUMIBLOCK) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
 
