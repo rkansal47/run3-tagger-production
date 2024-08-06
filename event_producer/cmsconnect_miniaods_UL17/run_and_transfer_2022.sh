@@ -70,6 +70,7 @@ fi
 
 if [ -f "${PROCNAME}.py" ]; then
   # quick hack to move the custom fragment to the right place
+  mkdir -p "${WORKDIR}/fragments"
   mv -f "${PROCNAME}.py" "${WORKDIR}/fragments"
 fi
 
