@@ -26,7 +26,6 @@ if ! [ -d fragments ]; then
 else
   mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
 fi
-cd hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17
 
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
 
@@ -109,6 +108,7 @@ sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/${PROCNAME}.p
 eval `scram runtime -sh`
 echo "scram b -j $NTHREAD"
 scram b -j $NTHREAD
+cp -r Configuration $WORKDIR
 cd $WORKDIR
 
 ############### HIG-Run3Summer22wmLHEGS-00228 ###############
