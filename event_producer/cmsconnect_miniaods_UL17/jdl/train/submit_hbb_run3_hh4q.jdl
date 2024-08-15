@@ -17,7 +17,8 @@ BEGINSEED = 500000
 LHEPRODSCRIPT =
 
 # EOS path to store the output
-EOSPATH = root://eosuser.cern.ch//eos/user/z/zichun/higgs/Hbb-tagger/hbb-samples/$(PROCNAME)
+# EOSPATH = root://eosuser.cern.ch//eos/user/z/zichun/higgs/Hbb-tagger/samples/$(PROCNAME)
+EOSPATH = root://redirector.t2.ucsd.edu:1095//store/user/zichun/Hbb-tagger/samples/$(PROCNAME)
 
 Arguments = $(JOBNUM) $(NEVENT) $(NEVENTLUMIBLOCK) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
 
@@ -33,6 +34,9 @@ Log        = log/$(Cluster)/job.log_$(Cluster)
 Output     = log/$(Cluster)/job.out_$(Cluster)-$(Process)
 Error      = log/$(Cluster)/job.err_$(Cluster)-$(Process)
 
+on_exit_remove   = (ExitBySignal == False) && (ExitCode == 0)
+max_retries      = 5
+requirements     = Machine =!= LastRemoteHost
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_input_files    = fragments/$(PROCNAME).py
