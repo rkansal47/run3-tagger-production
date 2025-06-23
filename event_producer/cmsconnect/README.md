@@ -14,3 +14,12 @@ Note: remember to change the `BEGINSEED` in the condor jdl file so that the prod
 ## To submit 
 e.g.:
 condor_submit jdl/train/submit_hbs_highmass.jdl
+
+
+## Local test command
+
+e.g.
+
+```bash
+../run_and_transfer_2022_v14.sh 1 2 1 1 BulkGravitonToHHToBBTauTau_MX-600to6000_MH-15to250 0 root://redirector.t2.ucsd.edu:1095//store/user/rkansal/bbtautau/tagger-samples/BulkGravitonToHHToBBTauTau_MX-600to6000_MH-15to250
+```
