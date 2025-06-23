@@ -18,13 +18,13 @@
 
 # sleep $(( ( RANDOM % 200 ) + 1 ))
 
-wget --tries=3 https://github.com/rkansal47/run3-tagger-prodution/archive/refs/heads/dev-miniaods.tar.gz
+wget --tries=3 https://github.com/rkansal47/run3-tagger-production/archive/refs/heads/dev-miniaods.tar.gz
 tar xaf dev-miniaods.tar.gz
 # check if fragment directory exists
 if ! [ -d fragments ]; then
-  mv run3-tagger-prodution-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
+  mv run3-tagger-production-dev-miniaods/event_producer/cmsconnect/{inputs,fragments} .
 else
-  mv run3-tagger-prodution-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
+  mv run3-tagger-production-dev-miniaods/event_producer/cmsconnect/inputs .
 fi
 
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
