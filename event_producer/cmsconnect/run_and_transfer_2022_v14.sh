@@ -18,13 +18,13 @@
 
 # sleep $(( ( RANDOM % 200 ) + 1 ))
 
-wget --tries=3 https://github.com/colizz/hww-tagging/archive/refs/heads/dev-miniaods.tar.gz
+wget --tries=3 https://github.com/rkansal47/run3-tagger-prodution/archive/refs/heads/dev-miniaods.tar.gz
 tar xaf dev-miniaods.tar.gz
 # check if fragment directory exists
 if ! [ -d fragments ]; then
-  mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
+  mv run3-tagger-prodution-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} .
 else
-  mv hww-tagging-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
+  mv run3-tagger-prodution-dev-miniaods/event_producer/cmsconnect_miniaods_UL17/inputs .
 fi
 
 # rsync -a /afs/cern.ch/user/c/coli/work/hww/hww-tagging-minis/event_producer/cmsconnect_miniaods_UL17/{inputs,fragments} . # test-only
@@ -199,13 +199,27 @@ cp -r $WORKDIR/Configuration .
 scram b
 cd $WORKDIR
 
-cmsDriver.py --python_filename MiniAODv2_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --geometry DB:Extended --filein file:reco.root --fileout file:mini.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsDriver.py --python_filename MiniAODv4_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --geometry DB:Extended --filein file:reco.root --fileout file:mini.root --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 # cmsRun -j FrameworkJobReport.xml MiniAODv2_cfg.py # produce FrameworkJobReport.xml in the last step
 
 # begin NanoAOD
-# modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22NanoAODv12-00101 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22NanoAODv12-00101 -> Get test command)
-cmsDriver.py --python_filename NanoAOD_cfg.py --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --conditions 130X_mcRun3_2022_realistic_v5 --step NANO --scenario pp --filein file:mini.root --fileout file:nano.root --era Run3 --mc --no_exec --nThreads $NTHREAD -n $NEVENT || exit $? ;
-cmsRun -j FrameworkJobReport.xml NanoAOD_cfg.py # produce FrameworkJobReport.xml in the last step
+echo "Beginning NanoAOD"
+export SCRAM_ARCH=el9_amd64_gcc12
+
+xrdcp root://cmseos.fnal.gov//store/user/rkansal/bbtautau/CMSSW_14_0_6_patch1.tgz ./
+xrdcp root://cmseos.fnal.gov//store/user/rkansal/bbtautau/MC_preEE2022_NANO.py ./
+
+echo "extracting tar"
+tar -xf CMSSW_14_0_6_patch1.tgz
+rm CMSSW_14_0_6_patch1.tgz
+cd CMSSW_14_0_6_patch1/src/ || exit
+scramv1 b ProjectRename # this handles linking the already compiled code - do NOT recompile
+eval $$(scramv1 runtime -sh) # cmsenv is an alias not on the workers
+echo $$CMSSW_BASE "is the CMSSW we have on the local worker node"
+cd ../.. || exit
+
+cmsRun MC_preEE2022_NANO.py || exit $? ;
+# cmsRun -j FrameworkJobReport.xml MC_preEE2022_NANO.py # produce FrameworkJobReport.xml in the last step
 
 cd $WORKDIR;
 # Transfer files
