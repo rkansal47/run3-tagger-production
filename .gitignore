@@ -1,6 +1,5 @@
 event_producer/cmsconnect/CMSSW*/
 event_producer/cmsconnect/log/
-event_producer/cmsconnect/inputs/
 event_producer/cmsconnect/dnn_test/
 event_producer/cmsconnect/hww-tagging-dev-miniaods/
 event_producer/cmsconnect/dummy.cc
