@@ -231,17 +231,17 @@ fi
 echo "Beginning NanoAOD"
 export SCRAM_ARCH=el8_amd64_gcc12
 
-# xrdcp -f root://cmseos.fnal.gov//store/user/rkansal/bbtautau/tagger/CMSSW_14_0_6_patch1.tgz ./
-
-# echo "extracting tar"
-# tar -xf CMSSW_14_0_6_patch1.tgz
-# rm CMSSW_14_0_6_patch1.tgz
-
+if ! [ -d CMSSW_14_0_6_patch1 ]; then
+  xrdcp -f root://cmseos.fnal.gov//store/user/rkansal/bbtautau/tagger/CMSSW_14_0_6_patch1.tgz ./
+  echo "extracting tar"
+  tar -xf CMSSW_14_0_6_patch1.tgz
+  rm CMSSW_14_0_6_patch1.tgz
+fi
 
 cd CMSSW_14_0_6_patch1/src/ || exit
 scramv1 b ProjectRename # this handles linking the already compiled code - do NOT recompile
-eval $$(scramv1 runtime -sh) # cmsenv is an alias not on the workers
-echo $$CMSSW_BASE "is the CMSSW we have on the local worker node"
+eval `scramv1 runtime -sh` # cmsenv is an alias not on the workers
+echo $CMSSW_BASE "is the CMSSW we have on the local worker node"
 cd ../.. || exit
 
 cmsRun inputs/MC_preEE2022_NANO.py || exit $? ;
