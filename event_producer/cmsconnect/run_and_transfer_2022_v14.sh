@@ -118,8 +118,8 @@ cp $WORKDIR/fragments/${PROCNAME}.py Configuration/GenProduction/python/${PROCNA
 sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/${PROCNAME}.py
 eval `scram runtime -sh`
 echo "scram b -j $NTHREAD"
-# scram b -j $NTHREAD              # UNCOMMENT THIS
-# cp -r Configuration $WORKDIR     # UNCOMMENT THIS
+scram b -j $NTHREAD
+cp -r Configuration $WORKDIR
 cd $WORKDIR
 
 ############### HIG-Run3Summer22wmLHEGS-00228 ###############
