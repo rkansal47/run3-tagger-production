@@ -27,6 +27,8 @@ use_x509userproxy = true
 
 +JobFlavour = "tomorrow"
 +DesiredOS = "EL8"
+# Needed for cms-connect
++REQUIRED_OS = "rhel8"
 
 Log        = log/$(Cluster)/job.log_$(Cluster)
 Output     = log/$(Cluster)/job.out_$(Cluster)-$(Process)
