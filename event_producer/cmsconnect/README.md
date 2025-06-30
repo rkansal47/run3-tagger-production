@@ -21,5 +21,5 @@ condor_submit jdl/train/submit_hbs_highmass.jdl
 e.g.
 
 ```bash
-../run_and_transfer_2022_v14.sh 1 2 1 1 BulkGravitonToHHToBBTauTau_MX-600to6000_MH-15to250 0 root://redirector.t2.ucsd.edu:1095//store/user/rkansal/bbtautau/tagger-samples/BulkGravitonToHHToBBTauTau_MX-600to6000_MH-15to250
+../run_and_transfer_2022_v14.sh 2 2 1 1 BulkGravitonToHHToBBTauTau_MX-600to6000_MH-15to250 0 root://redirector.t2.ucsd.edu:1095//store/user/rkansal/bbtautau/tagger-samples/BulkGravitonToHHToBBTauTau_MX-600to6000_MH-15to250 2>&1 | tee out.txt
 ```

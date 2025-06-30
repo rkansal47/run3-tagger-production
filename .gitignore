@@ -5,6 +5,7 @@ event_producer/cmsconnect/hww-tagging-dev-miniaods/
 event_producer/cmsconnect/dummy.cc
 event_producer/cmsconnect/*.tar.gz
 event_producer/cmsconnect/*.py
-event_producer/cmsconnect/testrun
+event_producer/cmsconnect/testrun*
+event_producer/cmsconnect/tr*
 *.root
 *.log

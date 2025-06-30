@@ -28,7 +28,7 @@ x509userproxy = $ENV(X509_USER_PROXY)
 use_x509userproxy = true
 
 +JobFlavour = "tomorrow"
-+ApptainerImage = "/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel8"
++DesiredOS = "EL8"
 
 Log        = log/$(Cluster)/job.log_$(Cluster)
 Output     = log/$(Cluster)/job.out_$(Cluster)-$(Process)
@@ -42,4 +42,4 @@ when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_input_files    = fragments/$(PROCNAME).py
 transfer_output_files   = dummy.cc
 
-Queue JOBNUM from seq 1 1 |
+Queue JOBNUM from seq 1 1000 |

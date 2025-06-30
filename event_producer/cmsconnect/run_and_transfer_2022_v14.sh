@@ -177,7 +177,7 @@ fi
 #  DRPremix
 # modified based on https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get_test/HIG-Run3Summer22DRPremix-00166 (Source: https://cms-pdmv-prod.web.cern.ch/mcm/chained_requests?prepid=HIG-chain_Run3Summer22wmLHEGS_flowRun3Summer22DRPremix_flowRun3Summer22MiniAODv4_flowRun3Summer22NanoAODv12-00101&page=0&shown=15 -> HIG-Run3Summer22DRPremix-00166 -> Get test command)
 if ! [ -f digi.root ]; then
-  cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --pileup_input "filelist:inputs/premix_files_2022.txt" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2,siPixelQualityRawToDigi --geometry DB:Extended --filein file:sim.root --fileout file:digi.root --datamix PreMix --era Run3 --mc --nThreads $NTHREAD -n $NEVENT > digi.log 2>&1 || exit $? ; # too many output, log into file 
+  cmsDriver.py --python_filename DIGIPremix_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --pileup_input "filelist:inputs/premix_files_2022.txt" --conditions 124X_mcRun3_2022_realistic_v12 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2,siPixelQualityRawToDigi --geometry DB:Extended --filein file:sim.root --fileout file:digi.root --datamix PreMix --era Run3 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ; # too many output, log into file 
 fi
 
 
@@ -229,10 +229,14 @@ fi
 
 # begin NanoAOD
 echo "Beginning NanoAOD"
+echo "System software: `cat /etc/redhat-release`" #Operating System on that node
+source /cvmfs/cms.cern.ch/cmsset_default.sh
 export SCRAM_ARCH=el8_amd64_gcc12
+# env
 
 if ! [ -d CMSSW_14_0_6_patch1 ]; then
-  xrdcp -f root://cmseos.fnal.gov//store/user/rkansal/bbtautau/tagger/CMSSW_14_0_6_patch1.tgz ./
+  xrdcp root://cmseos.fnal.gov//store/user/rkansal/bbtautau/tagger/CMSSW_14_0_6_patch1.tgz ./
+  ls -lh .
   echo "extracting tar"
   tar -xf CMSSW_14_0_6_patch1.tgz
   rm CMSSW_14_0_6_patch1.tgz
