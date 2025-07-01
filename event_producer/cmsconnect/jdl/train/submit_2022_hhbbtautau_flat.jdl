@@ -4,14 +4,14 @@ Executable = run_and_transfer_2022_v14.sh
 +ProjectName="cms.org"
 
 # custom args
-NEVENT = 500
+NEVENT = 250
 NTHREAD = 1
 PROCNAME = BulkGravitonToHHToBBTauTau_MX-600to6000_MH-15to250
 # this dictates how often the config will change (i.e., how often different H, X masses are sampled)
 NEVENTLUMIBLOCK = 10
 
 # note: use different seeds in different H->2prong and H->WW/ZZ routines to avoid overlap in LHE events
-BEGINSEED = 500000
+BEGINSEED = 800000
 
 # special LHE production configs for HWW/HZZ
 LHEPRODSCRIPT =
@@ -22,7 +22,7 @@ EOSPATH = root://redirector.t2.ucsd.edu:1095//store/user/rkansal/bbtautau/tagger
 Arguments = $(JOBNUM) $(NEVENT) $(NEVENTLUMIBLOCK) $(NTHREAD) $(PROCNAME) $(BEGINSEED) $(EOSPATH) $(LHEPRODSCRIPT)
 
 request_cpus = 1
-request_memory = 2000
+request_memory = 4000
 use_x509userproxy = true
 
 +JobFlavour = "tomorrow"
@@ -42,4 +42,4 @@ when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_input_files    = fragments/$(PROCNAME).py
 transfer_output_files   = dummy.cc
 
-Queue JOBNUM from seq 1 1000 |
+Queue JOBNUM from seq 1001 3000 |
